@@ -7,6 +7,7 @@ This repository contains my solutions for the Full Stack Open course offered by 
 | Part   | 主题                     | 完成状态 |
 | ------ | ------------------------ | -------- |
 | Part 0 | Fundamentals of Web Apps | √       |
+| Part 1 | Fundamentals of React    | √       |
 | ...    | ...                      | ...      |
 
 ## Directory Structure
@@ -21,6 +22,5 @@ This repository contains my solutions for the Full Stack Open course offered by 
 ├── part2
 │ ├── countries
 │ └── phonebook
-├── LICENSE
 └── README.md
 ```

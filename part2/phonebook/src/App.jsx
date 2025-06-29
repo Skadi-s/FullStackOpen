@@ -19,8 +19,8 @@ const App = () => {
     setNewName('')
   }
 
-  const personsToShow = persons.map((person, index) => (
-    <div key={index}>{person.name}</div>
+  const personsToShow = persons.map((person) => (
+    <div key={person.name}>{person.name}</div>
   ))
 
   return (

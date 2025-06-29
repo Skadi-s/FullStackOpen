@@ -1,13 +1,18 @@
 import { useState } from 'react'
+import PersonForm from './components/PersonForm'
+import Filter from './components/Filter'
+import Number from './components/Number'
 
 const App = () => {
+  // 将所有状态提升到 App 组件
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
+    { name: 'Arto Hellas', number: '040-123456' }
   ])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
 
+  // 处理函数
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
@@ -22,10 +27,13 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
+    
+    // 检查是否已存在相同姓名
     if (persons.some(person => person.name === newName)) {
       alert(`${newName} is already added to phonebook`)
       return
     }
+
     const personObject = {
       name: newName,
       number: newNumber
@@ -35,34 +43,26 @@ const App = () => {
     setNewNumber('')
   }
 
-  const personsToShow = persons
-    .filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
-    .map(person => (
-      <div key={person.name}>
-        {person.name} {person.number}
-      </div>
-    ))
-
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input value={filter} onChange={handleFilterChange} />
-      </div>
+      <Filter 
+        filter={filter} 
+        handleFilterChange={handleFilterChange} 
+      />
       <h2>Add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm 
+        newName={newName}
+        newNumber={newNumber}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+        addPerson={addPerson}
+      />
       <h2>Numbers</h2>
-      {personsToShow}
+      <Number 
+        persons={persons}
+        filter={filter}
+      />
     </div>
   )
 }

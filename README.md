@@ -8,6 +8,7 @@ This repository contains my solutions for the Full Stack Open course offered by 
 | ------ | ------------------------ | -------- |
 | Part 0 | Fundamentals of Web Apps | √       |
 | Part 1 | Fundamentals of React    | √       |
+| Part 2 |                          |          |
 | ...    | ...                      | ...      |
 
 ## Directory Structure

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Note from './components/Note'
 import noteService from './services/notes'
 
@@ -20,15 +19,12 @@ const App = () => {
       important: Math.random() < 0.5,
     }
 
-    axios
-      .post('http://localhost:3001/notes', noteObject)
+    noteService
+      .create(noteObject)
       .then(response => {
-        console.log(response)
         setNotes(notes.concat(response.data))
         setNewNote('')
-    })
-
-    setNewNote('')
+      })
   }
 
   const handleNoteChange = event => {
@@ -41,6 +37,7 @@ const App = () => {
   
   const toggleImportanceOf = id => {
     const note = notes.find(n => n.id === id)
+    console.log('toggleImportanceOf', id, note)
     const changedNote = { ...note, important: !note.important }
 
     noteService
@@ -71,7 +68,7 @@ useEffect(() => {
           <Note 
             key={note.id} 
             note={note} 
-            toggleImportanceOf={() => toggleImportanceOf(note.id)} />
+            toggleImportance={() => toggleImportanceOf(note.id)} />
         )}
       </ul>
       <form onSubmit={addNote}>

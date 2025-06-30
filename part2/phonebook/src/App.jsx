@@ -1,15 +1,13 @@
 import { useState } from 'react'
 import { useEffect } from 'react'
-import axios from 'axios'
+import phoneService from './services/phones'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
 import Number from './components/Number'
 
 const App = () => {
   // 将所有状态提升到 App 组件
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' }
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
@@ -40,20 +38,22 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    setPersons(persons.concat(personObject))
-    setNewName('')
-    setNewNumber('')
+    phoneService
+      .create(personObject)
+      .then(response => {
+        setPersons(persons.concat(response.data))
+        setNewName('')
+        setNewNumber('')
+      })
   }
 
   useEffect(() => {
-  console.log('effect')
-  axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      console.log('promise fulfilled')
-      setPersons(response.data)
-    })
-}, [])
+    phoneService
+      .getAll()
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
 
   return (
     <div>

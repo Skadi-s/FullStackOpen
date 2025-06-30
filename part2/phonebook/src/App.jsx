@@ -30,11 +30,20 @@ const App = () => {
     
     // 检查是否已存在相同姓名
     if (persons.some(person => person.name === newName)) {
-      phoneService.update(
-        persons.find(person => person.name === newName).id,
-        { name: newName, number: newNumber }
-      )
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        phoneService.update(
+          persons.find(person => person.name === newName).id,
+          { name: newName, number: newNumber }
+        )
+        .then(response => {
+          setPersons(persons.map(person => 
+            person.name === newName ? response.data : person
+          ))
+          setNewName('')
+          setNewNumber('')
+        })
       return
+      }
     }
 
     const personObject = {

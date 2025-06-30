@@ -4,6 +4,8 @@ import phoneService from './services/phones'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
 import Number from './components/Number'
+import Notification from './components/Notification'
+
 
 const App = () => {
   // 将所有状态提升到 App 组件
@@ -11,6 +13,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [message, setMessage] = useState(null)  
 
   // 处理函数
   const handleNameChange = (event) => {
@@ -42,6 +45,12 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+        .catch(error => {
+          setMessage(`Error: ${error.response.data.error}`)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
+        })
       return
       }
     }
@@ -53,9 +62,19 @@ const App = () => {
     phoneService
       .create(personObject)
       .then(response => {
+        setMessage(`Added ${response.data.name}`)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
         setPersons(persons.concat(response.data))
         setNewName('')
         setNewNumber('')
+      })
+      .catch(error => {
+        setMessage(`Error: ${error.response.data.error}`)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
       })
   }
 
@@ -85,6 +104,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter 
         filter={filter} 
         handleFilterChange={handleFilterChange} 

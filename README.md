@@ -4,12 +4,12 @@ This repository contains my solutions for the Full Stack Open course offered by 
 
 [Full Stack Open](https://fullstackopen.com/)
 
-| Part   | 主题                     | 完成状态 |
-| ------ | ------------------------ | -------- |
-| Part 0 | Fundamentals of Web Apps | √       |
-| Part 1 | Fundamentals of React    | √       |
-| Part 2 |                          |          |
-| ...    | ...                      | ...      |
+| Part   | 主题                      | 完成状态 |
+| ------ | ------------------------- | -------- |
+| Part 0 | Fundamentals of Web Apps  | √       |
+| Part 1 | Fundamentals of React     | √       |
+| Part 2 | Communicating with server | √       |
+| ...    | ...                       | ...      |
 
 ## Directory Structure
 

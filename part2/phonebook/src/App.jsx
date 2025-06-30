@@ -30,7 +30,10 @@ const App = () => {
     
     // 检查是否已存在相同姓名
     if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
+      phoneService.update(
+        persons.find(person => person.name === newName).id,
+        { name: newName, number: newNumber }
+      )
       return
     }
 

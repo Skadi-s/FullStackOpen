@@ -45,6 +45,12 @@ const App = () => {
       .then(response => {
         setNotes(notes.map(note => note.id !== id ? note : response.data))
       })
+      .catch(() => {
+        alert(
+          `the note '${note.content}' was already removed from server`
+        )
+        setNotes(notes.filter(n => n.id !== id))
+      })
   }
 
 useEffect(() => {

@@ -47,6 +47,21 @@ const App = () => {
       })
   }
 
+  const deletePerson = (id) => {
+    const person = persons.find(person => person.id  === id)
+    if (person && window.confirm(`delete ${person.name}?`)) {
+      console.log(id)
+      phoneService
+        .deletePerson(id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id))
+        })
+        .catch(() => {
+          alert(`${person.name} does not exist`)
+        })
+    }
+  }
+
   useEffect(() => {
     phoneService
       .getAll()
@@ -74,6 +89,7 @@ const App = () => {
       <Number 
         persons={persons}
         filter={filter}
+        deletePerson={deletePerson}
       />
     </div>
   )

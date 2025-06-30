@@ -1,4 +1,5 @@
 const express = require('express')
+const morgan = require('morgan');
 const app = express()
 
 let phonebook = [
@@ -23,6 +24,8 @@ let phonebook = [
       "number": "39-23-6423122"
     }
 ]
+
+app.use(morgan('tiny'))
 
 app.get('/', (request, response) => {
   response.send('<h1>Phonebook</h1>')

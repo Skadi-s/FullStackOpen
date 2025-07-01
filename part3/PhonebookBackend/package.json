@@ -16,7 +16,6 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "heroku": "^8.7.1",
     "mongoose": "^8.16.1",
     "morgan": "^1.10.0"
   }

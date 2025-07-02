@@ -17,28 +17,42 @@ describe('Blog API Tests', () => {
         await Blog.insertMany(initialBlogs)
     })
 
-    test('GET /api/blogs returns all blogs', async () => {
-        const response = await api.get('/api/blogs')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+    describe('GET /api/blogs', () => {
+        test('returns blogs as JSON', async () => {
+            await api.get('/api/blogs')
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+        })
 
-        assert.strictEqual(response.body.length, 2)
-        assert.strictEqual(response.body[0].title, 'Blog 1')
-        assert.strictEqual(response.body[1].title, 'Blog 2')
+        test('blogs are returned as an array', async () => {
+            const response = await api.get('/api/blogs')
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(Array.isArray(response.body), true)
+        })
+
+        test('GET /api/blogs returns the correct number of blogs', async () => {
+            const response = await api.get('/api/blogs')
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(response.body.length, 2)
+        })
+        test('GET /api/blogs/:id returns a specific blog', async () => {
+            const blogs = await Blog.find({})
+            const blogToView = blogs[0]
+
+            const response = await api.get(`/api/blogs/${blogToView.id}`)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(response.body.title, blogToView.title)
+            })
     })
 
-    test('GET /api/blogs/:id returns a specific blog', async () => {
-        const blogs = await Blog.find({})
-        const blogToView = blogs[0]
-
-        const response = await api.get(`/api/blogs/${blogToView.id}`)
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
-
-        assert.strictEqual(response.body.title, blogToView.title)
-    })
-
-    test('POST /api/blogs creates a new blog', async () => {
+    describe('POST /api/blogs/:id', () => {
+        test('POST /api/blogs creates a new blog', async () => {
         const newBlog = {
             title: 'New Blog',
             author: 'New Author',
@@ -59,21 +73,47 @@ describe('Blog API Tests', () => {
         const blogsAtEnd = await Blog.find({})
         assert.strictEqual(blogsAtEnd.length, 3)
         assert.strictEqual(blogsAtEnd[2].title, newBlog.title)
+        })
+   })
+
+   describe('PUT /api/blogs/:id', () => {
+        test('PUT /api/blogs/:id updates a blog', async () => {
+            const blogs = await Blog.find({})
+            const blogToUpdate = blogs[0]
+
+            const updatedBlog = {
+                title: 'Updated Blog',
+                author: 'Updated Author',
+                url: 'https://example.com/updated-blog',
+                likes: 1
+            }
+
+            const response = await api.put(`/api/blogs/${blogToUpdate.id}`)
+                .send(updatedBlog)
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(response.body.title, updatedBlog.title)
+            assert.strictEqual(response.body.author, updatedBlog.author)
+            assert.strictEqual(response.body.url, updatedBlog.url)
+            assert.strictEqual(response.body.likes, updatedBlog.likes)
+            const blogsAtEnd = await Blog.find({})
+            assert.strictEqual(blogsAtEnd.length, 2)
+        })
     })
 
-    test('DELETE /api/blogs/:id deletes a blog', async () => {
-        const blogs = await Blog.find({})
-        const blogToDelete = blogs[0]
+    describe('DELETE /api/blogs/:id', () => {
+        test('DELETE /api/blogs/:id deletes a blog', async () => {
+            const blogs = await Blog.find({})
+            const blogToDelete = blogs[0]
 
-        console.log('Blog to delete:', blogToDelete.id)
-        console.log('Blog to delete', blogToDelete)
+            await api.delete(`/api/blogs/${blogToDelete.id}`)
+                .expect(204)
 
-        await api.delete(`/api/blogs/${blogToDelete.id}`)
-            .expect(204)
-
-        const blogsAtEnd = await Blog.find({})
-        assert.strictEqual(blogsAtEnd.length, 1)
-        assert.strictEqual(blogsAtEnd[0].title, 'Blog 2')
+            const blogsAtEnd = await Blog.find({})
+            assert.strictEqual(blogsAtEnd.length, 1)
+            assert.strictEqual(blogsAtEnd[0].title, 'Blog 2')
+        })
     })
 })
 

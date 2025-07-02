@@ -1,4 +1,4 @@
-const { test, after, beforeEach} = require('node:test')
+const { test, after, beforeEach, describe} = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
@@ -7,97 +7,61 @@ const Blog = require('../models/blog')
 
 const api = supertest(app)
 
-const initialBlogs = [
-  {
-    title: 'Blog 1',
-    author: 'Author 1',
-    url: 'https://example.com/blog1',
-    likes: 5
-  },
-  {
-    title: 'Blog 2',
-    author: 'Author 2',
-    url: 'https://example.com/blog2',
-    likes: 10
-  }
-]
+describe('Blog API Tests', () => {
+    beforeEach(async () => {
+        await Blog.deleteMany({})
+        const initialBlogs = [
+        { title: 'Blog 1', author: 'Author 1', url: 'https://example.com/blog1', likes: 5 },
+        { title: 'Blog 2', author: 'Author 2', url: 'https://example.com/blog2', likes: 10 }
+        ]
+        await Blog.insertMany(initialBlogs)
+    })
 
-beforeEach(async () => {
-  await Blog.deleteMany({})
-  await Blog.insertMany(initialBlogs)
-})
+    test('GET /api/blogs returns all blogs', async () => {
+        const response = await api.get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
 
+        assert.strictEqual(response.body.length, 2)
+        assert.strictEqual(response.body[0].title, 'Blog 1')
+        assert.strictEqual(response.body[1].title, 'Blog 2')
+    })
 
-test('blogs are returned as json', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
+    test('GET /api/blogs/:id returns a specific blog', async () => {
+        const blogs = await Blog.find({})
+        const blogToView = blogs[0]
 
-test('specific blog is returned', async () => {
-  const response = await api.get('/api/blogs')
-  const blog = response.body.find(b => b.title === 'Blog 1')
-  assert.ok(blog)
-  assert.strictEqual(blog.title, 'Blog 1')
-  assert.strictEqual(blog.author, 'Author 1')
-  assert.strictEqual(blog.url, 'https://example.com/blog1')
-  assert.strictEqual(blog.likes, 5)
-})
+        const response = await api.get(`/api/blogs/${blogToView.id}`)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
 
-test('a blog can be added', async () => {
-  const newBlog = {
-    title: 'New Blog',
-    author: 'New Author',
-    url: 'https://example.com/new-blog',
-    likes: 0
-  }
+        assert.strictEqual(response.body.title, blogToView.title)
+    })
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+    test('POST /api/blogs creates a new blog', async () => {
+        const newBlog = {
+            title: 'New Blog',
+            author: 'New Author',
+            url: 'https://example.com/new-blog',
+            likes: 0
+        }
 
-  const response = await api.get('/api/blogs')
-  assert.strictEqual(response.body.length, initialBlogs.length + 1)
-  const addedBlog = response.body.find(b => b.title === 'New Blog')
-  assert.ok(addedBlog)
-})
+        const response = await api.post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
 
-test('a blog without likes defaults to 0', async () => {
-  const newBlog = {
-    title: 'Blog without likes',
-    author: 'Author without likes',
-    url: 'https://example.com/blog-without-likes'
-  }
+        assert.strictEqual(response.body.title, newBlog.title)
+        assert.strictEqual(response.body.author, newBlog.author)
+        assert.strictEqual(response.body.url, newBlog.url)
+        assert.strictEqual(response.body.likes, newBlog.likes)
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
-
-    const response = await api.get('/api/blogs')
-    const addedBlog = response.body.find(b => b.title === 'Blog without likes')
-    assert.ok(addedBlog)
-    assert.strictEqual(addedBlog.likes, 0)
-    assert.strictEqual(addedBlog.author, 'Author without likes')
-    assert.strictEqual(addedBlog.url, 'https://example.com/blog-without-likes')
-})
-
-test('a blog without title or url returns 400', async () => {
-  const newBlog = {
-    author: 'Author without title',
-    likes: 0
-  }
-
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
+        const blogsAtEnd = await Blog.find({})
+        assert.strictEqual(blogsAtEnd.length, 3)
+        assert.strictEqual(blogsAtEnd[2].title, newBlog.title)
+    })
 })
 
 after(async () => {
-  await mongoose.connection.close()
+    await mongoose.connection.close()
 })

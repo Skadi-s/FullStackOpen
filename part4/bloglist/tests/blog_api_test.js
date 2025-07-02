@@ -4,6 +4,8 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 
 const api = supertest(app)
 
@@ -113,6 +115,38 @@ describe('Blog API Tests', () => {
             const blogsAtEnd = await Blog.find({})
             assert.strictEqual(blogsAtEnd.length, 1)
             assert.strictEqual(blogsAtEnd[0].title, 'Blog 2')
+        })
+    })
+})
+
+describe('User API Tests', () => {
+    beforeEach(async () => {
+        await User.deleteMany({})
+
+        const passwordHash = await bcrypt.hash('sekret', 10)
+        const user = new User({ username: 'root', passwordHash })
+
+        await user.save()
+    })
+
+    describe('POST /api/users', () => {
+        test('creates a new user with valid data', async () => {
+            const newUser = {
+                username: 'testuser',
+                name: 'Test User',
+                password: 'password123'
+            }
+
+            const response = await api.post('/api/users')
+                .send(newUser)
+                .expect(201)
+                .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(response.body.username, newUser.username)
+            assert.strictEqual(response.body.name, newUser.name)
+
+            const usersAtEnd = await User.find({})
+            assert.strictEqual(usersAtEnd.length, 2)
         })
     })
 })

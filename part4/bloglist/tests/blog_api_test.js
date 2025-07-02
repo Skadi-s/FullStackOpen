@@ -60,6 +60,21 @@ describe('Blog API Tests', () => {
         assert.strictEqual(blogsAtEnd.length, 3)
         assert.strictEqual(blogsAtEnd[2].title, newBlog.title)
     })
+
+    test('DELETE /api/blogs/:id deletes a blog', async () => {
+        const blogs = await Blog.find({})
+        const blogToDelete = blogs[0]
+
+        console.log('Blog to delete:', blogToDelete.id)
+        console.log('Blog to delete', blogToDelete)
+
+        await api.delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
+
+        const blogsAtEnd = await Blog.find({})
+        assert.strictEqual(blogsAtEnd.length, 1)
+        assert.strictEqual(blogsAtEnd[0].title, 'Blog 2')
+    })
 })
 
 after(async () => {

@@ -45,6 +45,59 @@ test('specific blog is returned', async () => {
   assert.strictEqual(blog.likes, 5)
 })
 
+test('a blog can be added', async () => {
+  const newBlog = {
+    title: 'New Blog',
+    author: 'New Author',
+    url: 'https://example.com/new-blog',
+    likes: 0
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  assert.strictEqual(response.body.length, initialBlogs.length + 1)
+  const addedBlog = response.body.find(b => b.title === 'New Blog')
+  assert.ok(addedBlog)
+})
+
+test('a blog without likes defaults to 0', async () => {
+  const newBlog = {
+    title: 'Blog without likes',
+    author: 'Author without likes',
+    url: 'https://example.com/blog-without-likes'
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    const addedBlog = response.body.find(b => b.title === 'Blog without likes')
+    assert.ok(addedBlog)
+    assert.strictEqual(addedBlog.likes, 0)
+    assert.strictEqual(addedBlog.author, 'Author without likes')
+    assert.strictEqual(addedBlog.url, 'https://example.com/blog-without-likes')
+})
+
+test('a blog without title or url returns 400', async () => {
+  const newBlog = {
+    author: 'Author without title',
+    likes: 0
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })

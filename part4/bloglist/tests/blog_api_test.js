@@ -129,6 +129,34 @@ describe('User API Tests', () => {
         await user.save()
     })
 
+    describe('GET /api/users', () => {
+        test('returns all users as JSON', async () => {
+            const response = await api.get('/api/users')
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(Array.isArray(response.body), true)
+            assert.strictEqual(response.body.length, 1)
+        })
+
+        test('returns the correct user data', async () => {
+            const response = await api.get('/api/users')
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(response.body[0].username, 'root')
+            assert.strictEqual(response.body[0].name, undefined) // Name is not set in the initial user
+        })
+
+        test('should not return password hashes', async () => {
+            const response = await api.get('/api/users')
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(response.body[0].passwordHash, undefined)
+        })
+    })
+
     describe('POST /api/users', () => {
         test('creates a new user with valid data', async () => {
             const newUser = {

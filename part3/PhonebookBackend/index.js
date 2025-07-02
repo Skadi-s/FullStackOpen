@@ -2,29 +2,23 @@ const express = require('express')
 const morgan = require('morgan');
 const app = express()
 const cors = require('cors')
+const mongoose = require('mongoose')
 
-let phonebook = [
-    {
-      "id": 1,
-      "name": "Arto Hellas",
-      "number": "040-123456"
-    },
-    {
-      "id": 2,
-      "name": "Ada Lovelace",
-      "number": "39-44-5323523"
-    },
-    {
-      "id": 3,
-      "name": "Dan Abramov",
-      "number": "12-43-234345"
-    },
-    {
-      "id": 4,
-      "name": "Mary Poppendieck",
-      "number": "39-23-6423122"
-    }
-]
+const password = process.env.MONGODB_PASSWORD
+
+const url =
+  `mongodb+srv://jiangbl:${password}@cluster0.aud6j.mongodb.net/phonebook?retryWrites=true&w=majority&appName=Cluster0`
+
+mongoose.set('strictQuery',false)
+
+mongoose.connect(url)
+
+const personSchema = new mongoose.Schema({
+  name: String,
+  number: String,
+}, {collection: 'persons'})
+
+const Person = mongoose.model('Person', personSchema)
 
 morgan.token('post-data', (req) => {
   if (req.method === 'POST') {
@@ -44,7 +38,16 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(phonebook)
+  Person.find({}).then(persons => {
+    response.json(persons.map(person => ({
+      id: person._id,
+      name: person.name,
+      number: person.number
+    })))
+  }).catch(error => {
+    console.error('Error fetching persons:', error)
+    response.status(500).send({ error: 'Failed to fetch persons' })
+  })
 })
 
 app.get('/info', (request, response) => { 

@@ -97,6 +97,31 @@ app.delete('/api/persons/:id', (request, response) => {
   })
 })
 
+app.put('/api/persons/:id', express.json(), (request, response) => {
+  const id = request.params.id
+  const body = request.body
+  const updatedPerson = {
+    name: body.name,
+    number: body.number
+  }
+  Person.findByIdAndUpdate(id, updatedPerson, { new: true, runValidators: true })
+    .then(result => {
+      if (result) {
+        response.json({
+          id: result._id,
+          name: result.name,
+          number: result.number
+        })
+      } else {
+        response.status(404).send({ error: 'Person not found' })
+      }
+    }
+  ).catch(error => {
+    console.error('Error updating person:', error)
+    response.status(500).send({ error: 'Failed to update person' })
+  })
+})
+
 // 错误处理中间件
 app.use((error, request, response, next) => {
   console.error(error.message)

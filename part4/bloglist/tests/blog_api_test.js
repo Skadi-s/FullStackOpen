@@ -176,6 +176,49 @@ describe('User API Tests', () => {
             const usersAtEnd = await User.find({})
             assert.strictEqual(usersAtEnd.length, 2)
         })
+
+        test('returns 400 if username or password is missing', async () => {
+            const newUser = {
+                name: 'Test User'
+            }
+
+            await api.post('/api/users')
+                .send(newUser)
+                .expect(400)
+
+            const usersAtEnd = await User.find({})
+            assert.strictEqual(usersAtEnd.length, 1) // No new user should be created
+        })
+
+        test('returns 400 if username is too short', async () => {
+            const newUser = {
+                username: 'ab',
+                name: 'Test User',
+                password: 'password123'
+            }
+
+            await api.post('/api/users')
+                .send(newUser)
+                .expect(400)
+
+            const usersAtEnd = await User.find({})
+            assert.strictEqual(usersAtEnd.length, 1) // No new user should be created
+        })
+
+        test('returns 400 if password is too short', async () => {
+            const newUser = {
+                username: 'testuser',
+                name: 'Test User',
+                password: 'ab'
+            }
+
+            await api.post('/api/users')
+                .send(newUser)
+                .expect(400)
+
+            const usersAtEnd = await User.find({})
+            assert.strictEqual(usersAtEnd.length, 1) // No new user should be created
+        })
     })
 })
 

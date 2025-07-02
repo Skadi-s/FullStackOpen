@@ -1,14 +1,23 @@
 {
-    "name": "bloglist",
-    "private": true,
-    "version": "0.0.0",
-    "type": "module",
-    "scripts": {
-        "start": "node index.js",
-        "dev": "nodemon index.js"
-    },
-    "devDependencies": {
-        "dotenv": "^17.0.1",
-        "nodemon": "^3.1.10"
-    }
+  "name": "bloglist",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "jiangbl",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "dotenv": "^17.0.1",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.1",
+    "morgan": "^1.10.0"
+  }
 }

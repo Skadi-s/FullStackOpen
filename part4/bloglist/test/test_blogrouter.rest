@@ -1,0 +1,32 @@
+### 获取所有博客
+GET http://localhost:3000/api/blogs
+
+### 创建新博客
+POST http://localhost:3000/api/blogs
+Content-Type: application/json
+
+{
+  "title": "New Blog",
+  "author": "John Doe",
+  "url": "https://example.com/new-blog",
+  "likes": 5
+}
+
+### 测试创建博客（缺少必需字段）
+POST http://localhost:3000/api/blogs
+Content-Type: application/json
+
+{
+  "author": "Jane Doe",
+  "likes": 3
+}
+
+### 测试创建博客（无likes字段，应默认为0）
+POST http://localhost:3000/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Blog without likes",
+  "author": "Test Author",
+  "url": "https://example.com/test"
+}

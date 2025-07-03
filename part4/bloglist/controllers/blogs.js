@@ -20,13 +20,18 @@ blogRouter.get('/:id', async (request, response) => {
 
 blogRouter.post('/', async (request, response) => {
     const body = request.body;
+    const token = request.token;
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    if (!token || !decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' });
+    }
 
     const blog = new Blog({
       title: body.title,
       author: body.author,
       url: body.url,
       likes: body.likes || 0,
-      user: body.userId // Assuming userId is passed in the request body
+      user: decodedToken.id
     })
 
     const savedBlog = await blog.save();

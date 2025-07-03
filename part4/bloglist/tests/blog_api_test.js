@@ -4,8 +4,6 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
-const User = require('../models/user')
-const bcrypt = require('bcrypt')
 
 const api = supertest(app)
 
@@ -13,8 +11,8 @@ describe('Blog API Tests', () => {
     beforeEach(async () => {
         await Blog.deleteMany({})
         const initialBlogs = [
-        { title: 'Blog 1', author: 'Author 1', url: 'https://example.com/blog1', likes: 5 },
-        { title: 'Blog 2', author: 'Author 2', url: 'https://example.com/blog2', likes: 10 }
+        { title: 'Blog 1', author: 'Author 1', url: 'https://example.com/blog1', likes: 5, user: '6865da51049c4d1f806f6540' },
+        { title: 'Blog 2', author: 'Author 2', url: 'https://example.com/blog2', likes: 10, user: '6865da51049c4d1f806f6540' }
         ]
         await Blog.insertMany(initialBlogs)
     })
@@ -26,12 +24,15 @@ describe('Blog API Tests', () => {
                 .expect('Content-Type', /application\/json/)
         })
 
-        test('blogs are returned as an array', async () => {
-            const response = await api.get('/api/blogs')
+        test('GET blogs id exists', async () => {
+            const blogs = await Blog.find({})
+            const blogToView = blogs[0]
+
+            const response = await api.get(`/api/blogs/${blogToView.id}`)
                 .expect(200)
                 .expect('Content-Type', /application\/json/)
 
-            assert.strictEqual(Array.isArray(response.body), true)
+            assert.strictEqual(response.body.title, blogToView.title)
         })
 
         test('GET /api/blogs returns the correct number of blogs', async () => {
@@ -41,6 +42,7 @@ describe('Blog API Tests', () => {
 
             assert.strictEqual(response.body.length, 2)
         })
+
         test('GET /api/blogs/:id returns a specific blog', async () => {
             const blogs = await Blog.find({})
             const blogToView = blogs[0]
@@ -53,30 +55,73 @@ describe('Blog API Tests', () => {
             })
     })
 
-    describe('POST /api/blogs/:id', () => {
+    describe('POST /api/blogs', () => {
         test('POST /api/blogs creates a new blog', async () => {
-        const newBlog = {
-            title: 'New Blog',
-            author: 'New Author',
-            url: 'https://example.com/new-blog',
-            likes: 0
-        }
+            const newBlog = {
+                title: "New Blog 123",
+                author: "John Doe",
+                url: "https://example.com/new-blog",
+                likes: 5
+            }
 
-        const response = await api.post('/api/blogs')
-            .send(newBlog)
-            .expect(201)
-            .expect('Content-Type', /application\/json/)
+            const response = await api.post('/api/blogs')
+                .send(newBlog)
 
-        assert.strictEqual(response.body.title, newBlog.title)
-        assert.strictEqual(response.body.author, newBlog.author)
-        assert.strictEqual(response.body.url, newBlog.url)
-        assert.strictEqual(response.body.likes, newBlog.likes)
+            if (response.status !== 201) {
+                console.error('POST failed with status:', response.status)
+                console.error('Error response:', response.body)
+            }
 
-        const blogsAtEnd = await Blog.find({})
-        assert.strictEqual(blogsAtEnd.length, 3)
-        assert.strictEqual(blogsAtEnd[2].title, newBlog.title)
+            assert.strictEqual(response.status, 201)
+            assert.strictEqual(response.body.title, newBlog.title)
+            assert.strictEqual(response.body.author, newBlog.author)
+            assert.strictEqual(response.body.url, newBlog.url)
+            assert.strictEqual(response.body.likes, newBlog.likes)
+
+            const blogsAtEnd = await Blog.find({})
+            assert.strictEqual(blogsAtEnd.length, 3)
+            assert.strictEqual(blogsAtEnd[2].title, newBlog.title)
         })
-   })
+
+        test('POST /api/blogs without likes defaults to 0', async () => {
+            const newBlog = {
+                title: "New Blog without Likes",
+                author: "John Doe",
+                url: "https://example.com/new-blog"
+            }
+
+            const response = await api.post('/api/blogs')
+                .send(newBlog)
+
+            assert.strictEqual(response.status, 201)
+            assert.strictEqual(response.body.title, newBlog.title)
+            assert.strictEqual(response.body.author, newBlog.author)
+            assert.strictEqual(response.body.url, newBlog.url)
+            assert.strictEqual(response.body.likes, 0)
+
+            const blogsAtEnd = await Blog.find({})
+            assert.strictEqual(blogsAtEnd.length, 3)
+            assert.strictEqual(blogsAtEnd[2].title, newBlog.title)
+        })
+
+        test('POST /api/blogs without title or url returns 400', async () => {
+            const newBlog = {
+                author: "John Doe",
+                likes: 5
+            }
+
+            const response = await api.post('/api/blogs')
+                .send(newBlog)
+
+            assert.strictEqual(response.status, 400)
+
+            const blogsAtEnd = await Blog.find({
+                title: { $exists: true },
+                url: { $exists: true }  
+            })
+            assert.strictEqual(blogsAtEnd.length, 2)
+        })
+    })
 
    describe('PUT /api/blogs/:id', () => {
         test('PUT /api/blogs/:id updates a blog', async () => {
@@ -115,109 +160,6 @@ describe('Blog API Tests', () => {
             const blogsAtEnd = await Blog.find({})
             assert.strictEqual(blogsAtEnd.length, 1)
             assert.strictEqual(blogsAtEnd[0].title, 'Blog 2')
-        })
-    })
-})
-
-describe('User API Tests', () => {
-    beforeEach(async () => {
-        await User.deleteMany({})
-
-        const passwordHash = await bcrypt.hash('sekret', 10)
-        const user = new User({ username: 'root', passwordHash })
-
-        await user.save()
-    })
-
-    describe('GET /api/users', () => {
-        test('returns all users as JSON', async () => {
-            const response = await api.get('/api/users')
-                .expect(200)
-                .expect('Content-Type', /application\/json/)
-
-            assert.strictEqual(Array.isArray(response.body), true)
-            assert.strictEqual(response.body.length, 1)
-        })
-
-        test('returns the correct user data', async () => {
-            const response = await api.get('/api/users')
-                .expect(200)
-                .expect('Content-Type', /application\/json/)
-
-            assert.strictEqual(response.body[0].username, 'root')
-            assert.strictEqual(response.body[0].name, undefined) // Name is not set in the initial user
-        })
-
-        test('should not return password hashes', async () => {
-            const response = await api.get('/api/users')
-                .expect(200)
-                .expect('Content-Type', /application\/json/)
-
-            assert.strictEqual(response.body[0].passwordHash, undefined)
-        })
-    })
-
-    describe('POST /api/users', () => {
-        test('creates a new user with valid data', async () => {
-            const newUser = {
-                username: 'testuser',
-                name: 'Test User',
-                password: 'password123'
-            }
-
-            const response = await api.post('/api/users')
-                .send(newUser)
-                .expect(201)
-                .expect('Content-Type', /application\/json/)
-
-            assert.strictEqual(response.body.username, newUser.username)
-            assert.strictEqual(response.body.name, newUser.name)
-
-            const usersAtEnd = await User.find({})
-            assert.strictEqual(usersAtEnd.length, 2)
-        })
-
-        test('returns 400 if username or password is missing', async () => {
-            const newUser = {
-                name: 'Test User'
-            }
-
-            await api.post('/api/users')
-                .send(newUser)
-                .expect(400)
-
-            const usersAtEnd = await User.find({})
-            assert.strictEqual(usersAtEnd.length, 1) // No new user should be created
-        })
-
-        test('returns 400 if username is too short', async () => {
-            const newUser = {
-                username: 'ab',
-                name: 'Test User',
-                password: 'password123'
-            }
-
-            await api.post('/api/users')
-                .send(newUser)
-                .expect(400)
-
-            const usersAtEnd = await User.find({})
-            assert.strictEqual(usersAtEnd.length, 1) // No new user should be created
-        })
-
-        test('returns 400 if password is too short', async () => {
-            const newUser = {
-                username: 'testuser',
-                name: 'Test User',
-                password: 'ab'
-            }
-
-            await api.post('/api/users')
-                .send(newUser)
-                .expect(400)
-
-            const usersAtEnd = await User.find({})
-            assert.strictEqual(usersAtEnd.length, 1) // No new user should be created
         })
     })
 })

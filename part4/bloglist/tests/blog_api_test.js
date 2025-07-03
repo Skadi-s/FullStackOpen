@@ -95,6 +95,9 @@ describe('Blog API Tests', () => {
 
    describe('PUT /api/blogs/:id', () => {
         test('PUT /api/blogs/:id updates a blog', async () => {
+            const user = await User.findOne({ username: 'testuser1' })
+            const token = jwt.sign({ id: user._id }, process.env.SECRET)
+            
             const blogs = await Blog.find({})
             const blogToUpdate = blogs[0]
 
@@ -106,6 +109,7 @@ describe('Blog API Tests', () => {
             }
 
             const response = await api.put(`/api/blogs/${blogToUpdate.id}`)
+                .set('Authorization', `Bearer ${token}`)
                 .send(updatedBlog)
                 .expect(200)
                 .expect('Content-Type', /application\/json/)
@@ -121,10 +125,14 @@ describe('Blog API Tests', () => {
 
     describe('DELETE /api/blogs/:id', () => {
         test('DELETE /api/blogs/:id deletes a blog', async () => {
+            const user = await User.findOne({ username: 'testuser1' })
+            const token = jwt.sign({ id: user._id }, process.env.SECRET)
+
             const blogs = await Blog.find({})
             const blogToDelete = blogs[0]
 
             await api.delete(`/api/blogs/${blogToDelete.id}`)
+                .set('Authorization', `Bearer ${token}`)
                 .expect(204)
 
             const blogsAtEnd = await Blog.find({})

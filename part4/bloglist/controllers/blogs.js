@@ -44,13 +44,14 @@ blogRouter.delete('/:id', async (request, response) => {
   if (!token || !decodedToken.id) {
     return response.status(401).json({ error: 'token missing or invalid' });
   }
-  if (decodedToken.id !== request.params.id) {
-    return response.status(403).json({ error: 'forbidden' });
-  }
   const blog = await Blog.findById(request.params.id);
   if (!blog) {
     return response.status(404).json({ error: 'blog not found' });
   }
+  if (blog.user.toString() !== decodedToken.id) {
+    return response.status(403).json({ error: 'forbidden' });
+  }
+  
   await Blog.findByIdAndDelete(request.params.id);
   response.status(204).end();
 })
@@ -63,11 +64,15 @@ blogRouter.put('/:id', async (request, response) => {
   if (!token || !decodedToken.id) {
     return response.status(401).json({ error: 'token missing or invalid' });
   }
-  if (decodedToken.id !== request.params.id) {
-    return response.status(403).json({ error: 'forbidden' });
-  } 
   if (!body.title || !body.author || !body.url) {
     return response.status(400).json({ error: 'title, author, and url are required' });
+  }
+  const blogToUpdate = await Blog.findById(request.params.id);
+  if (!blogToUpdate) {
+    return response.status(404).json({ error: 'blog not found' });
+  }
+  if (blogToUpdate.user.toString() !== decodedToken.id) {
+    return response.status(403).json({ error: 'forbidden' });
   }
 
   const updatedBlog = {

@@ -80,7 +80,3 @@ describe('User API Tests', () => {
     })
 
 })
-
-after(async () => {
-    await mongoose.connection.close()
-})

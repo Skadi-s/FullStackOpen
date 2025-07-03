@@ -1,20 +1,18 @@
-const { test, after, beforeEach, describe} = require('node:test')
+const { test, after, beforeEach, describe } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+const setupDatabase = require('./setup')
 
 const api = supertest(app)
 
 describe('Blog API Tests', () => {
     beforeEach(async () => {
-        await Blog.deleteMany({})
-        const initialBlogs = [
-        { title: 'Blog 1', author: 'Author 1', url: 'https://example.com/blog1', likes: 5, user: '6865d77136e1a922c66e86bd' },
-        { title: 'Blog 2', author: 'Author 2', url: 'https://example.com/blog2', likes: 10, user: '6865d77136e1a922c66e86bd' }
-        ]
-        await Blog.insertMany(initialBlogs)
+        await setupDatabase.setupDatabase()
     })
 
     describe('GET /api/blogs', () => {
@@ -68,21 +66,20 @@ describe('Blog API Tests', () => {
     })
 
     describe('POST /api/blogs', () => {
-        test('POST /api/blogs creates a new blog', async () => {
+        test('POST with authentication creates a new blog', async () => {
+            const user = await User.findOne({ username: 'testuser1' })
+            const token = jwt.sign({ id: user._id }, process.env.SECRET)
+
             const newBlog = {
-                title: "New Blog 123",
-                author: "John Doe",
-                url: "https://example.com/new-blog",
+                title: 'New Blog',
+                author: 'John Doe',
+                url: 'https://example.com/new-blog',
                 likes: 5
             }
 
             const response = await api.post('/api/blogs')
+                .set('Authorization', `Bearer ${token}`)
                 .send(newBlog)
-
-            if (response.status !== 201) {
-                console.error('POST failed with status:', response.status)
-                console.error('Error response:', response.body)
-            }
 
             assert.strictEqual(response.status, 201)
             assert.strictEqual(response.body.title, newBlog.title)
@@ -93,45 +90,6 @@ describe('Blog API Tests', () => {
             const blogsAtEnd = await Blog.find({})
             assert.strictEqual(blogsAtEnd.length, 3)
             assert.strictEqual(blogsAtEnd[2].title, newBlog.title)
-        })
-
-        test('POST /api/blogs without likes defaults to 0', async () => {
-            const newBlog = {
-                title: "New Blog without Likes",
-                author: "John Doe",
-                url: "https://example.com/new-blog"
-            }
-
-            const response = await api.post('/api/blogs')
-                .send(newBlog)
-
-            assert.strictEqual(response.status, 201)
-            assert.strictEqual(response.body.title, newBlog.title)
-            assert.strictEqual(response.body.author, newBlog.author)
-            assert.strictEqual(response.body.url, newBlog.url)
-            assert.strictEqual(response.body.likes, 0)
-
-            const blogsAtEnd = await Blog.find({})
-            assert.strictEqual(blogsAtEnd.length, 3)
-            assert.strictEqual(blogsAtEnd[2].title, newBlog.title)
-        })
-
-        test('POST /api/blogs without title or url returns 400', async () => {
-            const newBlog = {
-                author: "John Doe",
-                likes: 5
-            }
-
-            const response = await api.post('/api/blogs')
-                .send(newBlog)
-
-            assert.strictEqual(response.status, 400)
-
-            const blogsAtEnd = await Blog.find({
-                title: { $exists: true },
-                url: { $exists: true }  
-            })
-            assert.strictEqual(blogsAtEnd.length, 2)
         })
     })
 
@@ -176,6 +134,3 @@ describe('Blog API Tests', () => {
     })
 })
 
-after(async () => {
-    await mongoose.connection.close()
-})

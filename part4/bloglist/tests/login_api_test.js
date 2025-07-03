@@ -5,17 +5,13 @@ const supertest = require('supertest')
 const app = require('../app')
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const setupDatabase = require('./setup')
 
 const api = supertest(app)
 
 describe('Login API Tests', () => {
     beforeEach(async () => {
-        await User.deleteMany({})
-        const initialUsers = [
-            { username: 'testuser1', name: 'Test User 1', passwordHash: await bcrypt.hash('password1', 10) },
-            { username: 'testuser2', name: 'Test User 2', passwordHash: await bcrypt.hash('password2', 10) }
-        ]
-        await User.insertMany(initialUsers)
+        await setupDatabase.setupDatabase()
     })
 
     describe('POST /api/login', () => {
@@ -49,5 +45,6 @@ describe('Login API Tests', () => {
 })
 
 after(async () => {
+    await User.deleteMany({})
     await mongoose.connection.close()
 })

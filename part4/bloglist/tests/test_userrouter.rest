@@ -1,0 +1,12 @@
+### User API Tests
+GET http://localhost:3000/api/users
+
+### POST User
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "name": "Test User",
+  "password": "password123"
+}

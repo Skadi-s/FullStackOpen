@@ -11,8 +11,8 @@ describe('Blog API Tests', () => {
     beforeEach(async () => {
         await Blog.deleteMany({})
         const initialBlogs = [
-        { title: 'Blog 1', author: 'Author 1', url: 'https://example.com/blog1', likes: 5, user: '6865da51049c4d1f806f6540' },
-        { title: 'Blog 2', author: 'Author 2', url: 'https://example.com/blog2', likes: 10, user: '6865da51049c4d1f806f6540' }
+        { title: 'Blog 1', author: 'Author 1', url: 'https://example.com/blog1', likes: 5, user: '6865d77136e1a922c66e86bd' },
+        { title: 'Blog 2', author: 'Author 2', url: 'https://example.com/blog2', likes: 10, user: '6865d77136e1a922c66e86bd' }
         ]
         await Blog.insertMany(initialBlogs)
     })
@@ -53,6 +53,18 @@ describe('Blog API Tests', () => {
 
             assert.strictEqual(response.body.title, blogToView.title)
             })
+
+        test('GET /api/blogs related to a specific user', async () => {
+            const blogs = await Blog.find({})
+            const userId = blogs[0].user
+
+            const response = await api.get(`/api/blogs?user=${userId}`)
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(response.body.length, 2)
+            assert.strictEqual(response.body[0].user, userId)
+        })
     })
 
     describe('POST /api/blogs', () => {

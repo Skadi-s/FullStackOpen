@@ -6,10 +6,11 @@ POST http://localhost:3000/api/blogs
 Content-Type: application/json
 
 {
-  "title": "New Blog",
+  "title": "New Blog 123",
   "author": "John Doe",
   "url": "https://example.com/new-blog",
-  "likes": 5
+  "likes": 5,
+  "userId": "6865d7df06219a09fe600647"
 }
 
 ### 测试创建博客（缺少必需字段）
@@ -30,3 +31,16 @@ Content-Type: application/json
   "author": "Test Author",
   "url": "https://example.com/test"
 }
+
+### 获取特定博客
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "name": "Test User",
+  "password": "password123"
+}
+
+### 获取特定用户
+GET http://localhost:3000/api/users

@@ -4,7 +4,8 @@ const blogSchema = new mongoose.Schema({
   title: { type: String, required: true },
   author: { type: String, required: true },
   url: { type: String, required: true },
-  likes: { type: Number, default: 0 }
+  likes: { type: Number, default: 0 },
+  user: String // Reference to the user who created the blog
 })
 
 blogSchema.set('toJSON', {

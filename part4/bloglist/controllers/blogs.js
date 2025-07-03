@@ -39,12 +39,36 @@ blogRouter.post('/', async (request, response) => {
   })
 
 blogRouter.delete('/:id', async (request, response) => {
+  const token = request.token;
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  if (!token || !decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' });
+  }
+  if (decodedToken.id !== request.params.id) {
+    return response.status(403).json({ error: 'forbidden' });
+  }
+  const blog = await Blog.findById(request.params.id);
+  if (!blog) {
+    return response.status(404).json({ error: 'blog not found' });
+  }
   await Blog.findByIdAndDelete(request.params.id);
   response.status(204).end();
 })
 
 blogRouter.put('/:id', async (request, response) => {
   const body = request.body;
+
+  const token = request.token;
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  if (!token || !decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' });
+  }
+  if (decodedToken.id !== request.params.id) {
+    return response.status(403).json({ error: 'forbidden' });
+  } 
+  if (!body.title || !body.author || !body.url) {
+    return response.status(400).json({ error: 'title, author, and url are required' });
+  }
 
   const updatedBlog = {
     title: body.title,

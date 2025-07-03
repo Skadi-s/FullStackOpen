@@ -39,60 +39,40 @@ blogRouter.post('/', async (request, response) => {
   })
 
 blogRouter.delete('/:id', async (request, response) => {
-  const token = request.token;
-  const user = request.user;
-  if (!token || !user) {
-    return response.status(401).json({ error: 'token missing or invalid' });
-  }
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token missing or invalid' });
+  const user = request.user
+  const blog = await Blog.findById(request.params.id)
+
+  if (!blog) {
+    return response.status(204).end()
   }
 
-  const blogToDelete = await Blog.findById(request.params.id);
-  if (!blogToDelete) {
-    return response.status(404).json({ error: 'blog not found' });
-  }
-  if (blogToDelete.user.toString() !== decodedToken.id) {
-    return response.status(403).json({ error: 'forbidden' });
+  if (user.id.toString() !== blog.user.toString()) {
+    return response.status(403).json({ error: 'user not authorized' })
   }
 
-  await Blog.findByIdAndDelete(request.params.id);
-  response.status(204).end();
+  user.blogs = user.blogs.filter(b => b.id.toString() !== blog.id.toString())
+
+  await blog.deleteOne()
+  response.status(204).end()
 })
 
 blogRouter.put('/:id', async (request, response) => {
-  const body = request.body;
-  const user = request.user;
-  const token = request.token;
-  if (!token || !user) {
-    return response.status(401).json({ error: 'token missing or invalid' });
-  }
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token missing or invalid' });
-  }
-  const blogToUpdate = await Blog.findById(request.params.id);
-  if (!blogToUpdate) {
-    return response.status(404).json({ error: 'blog not found' });
-  }
-  if (blogToUpdate.user.toString() !== decodedToken.id) {
-    return response.status(403).json({ error: 'forbidden' });
+  const { title, author, url, likes } = request.body
+
+  const blog = await Blog.findById(request.params.id)
+
+  if (!blog) {
+    return response.status(404).end()
   }
 
-  const updatedBlog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes
-  }
+  blog.title = title
+  blog.author = author
+  blog.url = url
+  blog.likes = likes
 
-  const blog = await Blog.findByIdAndUpdate(request.params.id, updatedBlog, { new: true });
-  if (blog) {
-    response.json(blog);
-  } else {
-    response.status(404).end();
-  }
+  const updatedBlog = await blog.save()
+
+  response.json(updatedBlog)
 })
 
 module.exports = blogRouter;

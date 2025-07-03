@@ -17,7 +17,10 @@ describe('Blog API Tests', () => {
 
     describe('GET /api/blogs', () => {
         test('returns blogs as JSON', async () => {
+            const user = await User.findOne({ username: 'testuser1' })
+            const token = jwt.sign({ id: user._id }, process.env.SECRET)
             await api.get('/api/blogs')
+                .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .expect('Content-Type', /application\/json/)
         })
@@ -25,8 +28,11 @@ describe('Blog API Tests', () => {
         test('GET blogs id exists', async () => {
             const blogs = await Blog.find({})
             const blogToView = blogs[0]
+            const user = await User.findOne({ username: 'testuser1' })
+            const token = jwt.sign({ id: user._id }, process.env.SECRET)
 
             const response = await api.get(`/api/blogs/${blogToView.id}`)
+                .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .expect('Content-Type', /application\/json/)
 
@@ -34,7 +40,10 @@ describe('Blog API Tests', () => {
         })
 
         test('GET /api/blogs returns the correct number of blogs', async () => {
+            const user = await User.findOne({ username: 'testuser1' })
+            const token = jwt.sign({ id: user._id }, process.env.SECRET)
             const response = await api.get('/api/blogs')
+                .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .expect('Content-Type', /application\/json/)
 
@@ -42,21 +51,29 @@ describe('Blog API Tests', () => {
         })
 
         test('GET /api/blogs/:id returns a specific blog', async () => {
+            const user = await User.findOne({ username: 'testuser1' })
+            const token = jwt.sign({ id: user._id }, process.env.SECRET)
+
             const blogs = await Blog.find({})
             const blogToView = blogs[0]
 
             const response = await api.get(`/api/blogs/${blogToView.id}`)
-            .expect(200)
+                .set('Authorization', `Bearer ${token}`)
+                .expect(200)
             .expect('Content-Type', /application\/json/)
 
             assert.strictEqual(response.body.title, blogToView.title)
             })
 
         test('GET /api/blogs related to a specific user', async () => {
+            const user = await User.findOne({ username: 'testuser1' })
+            const token = jwt.sign({ id: user._id }, process.env.SECRET)
+
             const blogs = await Blog.find({})
             const userId = blogs[0].user
 
             const response = await api.get(`/api/blogs?user=${userId}`)
+                .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .expect('Content-Type', /application\/json/)
 

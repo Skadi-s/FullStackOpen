@@ -26,17 +26,18 @@ const Blog = ({ blog, likeBlog , removeBlog }) => {
 
   return (
     <div style={style}>
-      <h2>{blog.title} by {blog.author}</h2>
-      <button onClick={() => {
-        if (viewbutton === 'view') {
-          setViewButton('hide')
-        } else {
-          setViewButton('view')
-        }
-      }}>{viewbutton}</button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <h2 style={{ margin: 0 }}>{blog.title} by {blog.author}</h2>
+        <button onClick={() => {
+          setViewButton(viewbutton === 'view' ? 'hide' : 'view')
+        }}>{viewbutton}</button>
+      </div>
       <div style={{ display: viewbutton === 'view' ? 'none' : '' }}>
         <p>{blog.url}</p>
-        <p>likes {likes} <button onClick={() => handleClickLike(blog.id)}>like</button></p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <p>likes {likes}</p>
+          <button onClick={() => handleClickLike(blog.id)}>like</button>
+        </div>
         <p>{blog.user.name}</p>
         <button onClick={() => handleClickRemove(blog.id)}>remove</button>
       </div>

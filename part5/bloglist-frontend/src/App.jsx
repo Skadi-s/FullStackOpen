@@ -93,17 +93,24 @@ const App = () => {
     }
   }
 
+  // 修改现有的 useEffect，只处理初始化
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       blogService.setToken(user.token)
+    }
+  }, [])
+
+  // 添加新的 useEffect 监听 user 状态变化
+  useEffect(() => {
+    if (user) {
       blogService.getAll().then(blogs => {
         setBlogs(blogs)
       })
     }
-  }, [])
+  }, [user])
   
   if (user !== null) {
     return (

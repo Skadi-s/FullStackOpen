@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
-import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
+import BlogFormTitle from './components/BlogFormTitle'
+import BlogForm from './components/BlogForm'
+import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Message from './components/Message'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [message, setMessage] = useState(null)
 
   const handleLogin = async (credentials) => {
     try {
@@ -17,8 +19,18 @@ const App = () => {
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
     } catch (exception) {
-      console.error('Login failed:', exception)
+      setMessage('Wrong username or password')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+      console.error('Login failed:', exception) 
     }
+  }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+    setUser(null)
+    setBlogs([])
   }
 
   useEffect(() => {
@@ -37,7 +49,11 @@ const App = () => {
     return (
       <div>
         <h2>blogs</h2>
-        <p>{user.name} logged in</p>
+        <div>
+          <Message message={message} />
+          <BlogFormTitle user={user} handleLogout={handleLogout} />
+          <BlogForm setBlogs={setBlogs} blogs={blogs} />
+        </div>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}
@@ -46,14 +62,9 @@ const App = () => {
   }
   return (
     <div>
-      <h2>Login</h2>
-      <LoginForm
-        handleLogin={handleLogin}
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}
-      />
+      <h2>Login to application</h2>
+      <Message message={message} />
+      <LoginForm handleLogin={handleLogin}/>
     </div>
   )
 

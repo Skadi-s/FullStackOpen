@@ -53,6 +53,26 @@ const App = () => {
     }
   }
 
+  const likeBlog = async (id) => {
+    const blogToLike = blogs.find(b => b.id === id)
+    const updatedBlog = { ...blogToLike, likes: blogToLike.likes + 1 }
+    try {
+      const returnedBlog = await blogService.update(id, updatedBlog)
+      setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
+      setMessage(`You liked ${returnedBlog.title} by ${returnedBlog.author}`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+      return returnedBlog
+    } catch (exception) {
+      setMessage('Failed to like blog')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+      console.error('Like blog failed:', exception)
+    }
+  }
+
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
@@ -77,7 +97,7 @@ const App = () => {
           </Togglable>
         </div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
         )}
       </div>
     )

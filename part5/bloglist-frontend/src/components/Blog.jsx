@@ -10,6 +10,10 @@ const Blog = ({ blog, likeBlog , removeBlog }) => {
   const [viewbutton, setViewButton] = useState('view')
   const [likes, setLikes] = useState(blog.likes)
 
+  const handleClickView = () => {
+    setViewButton(viewbutton === 'view' ? 'hide' : 'view')
+  }
+
   const handleClickLike = async(id) => {
     try {
       const updatedBlog = await likeBlog(id)
@@ -28,9 +32,7 @@ const Blog = ({ blog, likeBlog , removeBlog }) => {
     <div style={style}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <h2 style={{ margin: 0 }}>{blog.title} by {blog.author}</h2>
-        <button onClick={() => {
-          setViewButton(viewbutton === 'view' ? 'hide' : 'view')
-        }}>{viewbutton}</button>
+        <button onClick={handleClickView}>{viewbutton}</button>
       </div>
       <div style={{ display: viewbutton === 'view' ? 'none' : '' }}>
         <p>{blog.url}</p>

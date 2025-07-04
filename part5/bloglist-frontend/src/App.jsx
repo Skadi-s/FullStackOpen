@@ -33,6 +33,23 @@ const App = () => {
     setBlogs([])
   }
 
+  const createBlog = async (blogObject) => {
+    try {
+      const returnedBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(returnedBlog))
+      setMessage(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    } catch (exception) {
+      setMessage('Failed to create blog')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+      console.error('Blog creation failed:', exception)
+    }
+  }
+
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
@@ -52,7 +69,7 @@ const App = () => {
         <div>
           <Message message={message} />
           <BlogFormTitle user={user} handleLogout={handleLogout} />
-          <BlogForm setBlogs={setBlogs} blogs={blogs} />
+          <BlogForm createBlog={createBlog} />
         </div>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />

@@ -10,4 +10,12 @@ const setToken = (newToken) => {
   axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 }
 
-export default { getAll, setToken }
+const create = async (blogObject) => {
+  const config = {
+    headers: { Authorization: axios.defaults.headers.common['Authorization'] }
+  }
+  const response = await axios.post(baseUrl, blogObject, config)
+  return response.data
+}
+
+export default { getAll, setToken, create }

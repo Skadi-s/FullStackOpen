@@ -73,6 +73,26 @@ const App = () => {
     }
   }
 
+  const removeBlog = async (id) => {
+    const blogToRemove = blogs.find(b => b.id === id)
+    if (window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`)) {
+      try {
+        await blogService.remove(id)
+        setBlogs(blogs.filter(blog => blog.id !== id))
+        setMessage(`Blog ${blogToRemove.title} by ${blogToRemove.author} removed`)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+      } catch (exception) {
+        setMessage('Failed to remove blog')
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+        console.error('Remove blog failed:', exception)
+      }
+    }
+  }
+
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
@@ -97,7 +117,7 @@ const App = () => {
           </Togglable>
         </div>
         {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
-          <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
+          <Blog key={blog.id} blog={blog} likeBlog={likeBlog} removeBlog={removeBlog} />
         )}
       </div>
     )

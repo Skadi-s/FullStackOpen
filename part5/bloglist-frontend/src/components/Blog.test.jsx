@@ -109,3 +109,26 @@ test("view button toggles between view and hide", async () => {
   expect(screen.getByText("view")).toBeInTheDocument()
 })
 
+test("like button clicked twice", async () => {
+  const blog = {
+    id: "1",
+    title: "Test Blog",
+    author: "Test Author",
+    url: "https://testblog.com",
+    likes: 5,
+    user: { name: "Test User" }
+  }
+
+  const likeBlog = vi.fn()
+  const user = userEvent.setup()
+  render(<Blog blog={blog} likeBlog={likeBlog} />)
+  const viewButton = screen.getByText("view")
+  await user.click(viewButton)
+  const likeButton = screen.getByText("like")
+  await user.click(likeButton)
+  await user.click(likeButton)
+  expect(likeBlog).toHaveBeenCalledTimes(2)
+  expect(likeBlog).toHaveBeenCalledWith(blog.id)
+  expect(screen.getByText("likes 5")).toBeInTheDocument() //
+})
+

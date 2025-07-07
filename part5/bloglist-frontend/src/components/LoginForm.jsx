@@ -9,7 +9,7 @@ const LoginForm = ({ handleLogin }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} id="login-form">
       <div>
         <label>
           Username
@@ -17,6 +17,7 @@ const LoginForm = ({ handleLogin }) => {
             type="text"
             value={username}
             name="Username"
+            id="username"
             onChange={({ target }) => setUsername(target.value)}
           />
         </label>
@@ -28,11 +29,12 @@ const LoginForm = ({ handleLogin }) => {
             type="password"
             value={password}
             name="Password"
+            id="password"
             onChange={({ target }) => setPassword(target.value)}
           />
         </label>
       </div>
-      <button type="submit">Login</button>
+      <button type="submit" id="login-button">Login</button>
     </form>
   )
 }

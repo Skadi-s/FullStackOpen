@@ -5,30 +5,26 @@ import { setNotification, clearNotification } from '../reducers/notificationRedu
 const AnecdoteForm = () => {
   const dispatch = useDispatch()
 
-  const addAnecdote = (event) => {
+  const addAnecdote = async (event) => {
     event.preventDefault()
     const content = event.target.anecdote.value
     event.target.anecdote.value = ''
     
-    const newAnecdote = {
-      content,
-      id: (100000 * Math.random()).toFixed(0),
-      votes: 0
+    if (content.trim()) {
+      dispatch(createAnecdote(content))
+      dispatch(setNotification(`you created '${content}'`))
+      setTimeout(() => {
+        dispatch(clearNotification())
+      }, 5000)
     }
-    
-    dispatch(createAnecdote(newAnecdote))
-    dispatch(setNotification(`you created '${content}'`))
-    setTimeout(() => {
-      dispatch(clearNotification())
-    }, 5000)
   }
 
   return (
     <div>
       <h2>create new</h2>
-     <form onSubmit={addAnecdote}>
+      <form onSubmit={addAnecdote}>
         <div><input name="anecdote" /></div>
-        <button>create</button>
+        <button type="submit">create</button>
       </form>
     </div>
   )

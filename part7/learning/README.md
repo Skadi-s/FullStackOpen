@@ -1,12 +1,96 @@
-# React + Vite
+# 📝 完全无样式笔记应用
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+这是一个使用 React 组件化开发的简洁笔记应用，完全移除了所有样式。
 
-Currently, two official plugins are available:
+## 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **添加笔记** - 输入标题和内容创建新笔记
+- **编辑笔记** - 点击编辑按钮修改现有笔记
+- **删除笔记** - 删除不需要的笔记
+- **搜索笔记** - 在标题和内容中搜索关键词
+- **本地存储** - 使用 localStorage 自动保存
+- **完全无样式** - 移除所有内联样式和 CSS 文件
 
-## Expanding the ESLint configuration
+## 技术栈
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React 18 (函数组件 + Hooks)
+- Vite
+- 组件化架构
+- localStorage
+
+## 项目结构
+
+```
+src/
+├── components/
+│   ├── NoteForm.jsx     # 笔记表单组件
+│   ├── NoteItem.jsx     # 单个笔记项组件
+│   ├── NoteList.jsx     # 笔记列表组件
+│   └── SearchBox.jsx    # 搜索框组件
+├── App.jsx              # 主应用组件（状态管理）
+└── main.jsx             # 应用入口
+```
+
+## 组件说明
+
+### App.jsx (主组件)
+- 管理所有应用状态
+- 处理笔记的 CRUD 操作
+- 提供 localStorage 数据持久化
+
+### NoteForm.jsx
+- 处理笔记的添加和编辑
+- 支持编辑模式切换
+- 表单验证和提交
+
+### SearchBox.jsx
+- 提供搜索功能
+- 实时过滤笔记
+
+### NoteList.jsx
+- 显示笔记列表
+- 管理空状态显示
+
+### NoteItem.jsx
+- 单个笔记的展示
+- 编辑和删除操作
+
+## 使用方法
+
+1. 启动应用：`npm run dev`
+2. 在表单中输入标题和内容，点击"添加笔记"
+3. 使用搜索框查找特定笔记
+4. 点击"编辑"按钮修改笔记
+5. 点击"删除"按钮删除笔记
+
+## 样式清理完成
+
+✅ **完全无样式设计**
+- 移除了所有内联样式 (style 属性)
+- 移除了所有 CSS 文件导入
+- 删除了 App.css 和 index.css 的引用
+- 确保所有组件都是纯 HTML 结构
+
+## 组件化优势
+
+- **可重用性** - 每个组件都可以独立使用
+- **可维护性** - 代码分离，职责明确
+- **可测试性** - 组件可以单独测试
+- **可读性** - 代码结构清晰易懂
+
+## 开发说明
+
+这个项目是基于 Vite + React 的组件化笔记应用。项目从单文件 SPA 重构为组件化架构，并完全移除了所有样式，专注于功能实现。
+
+### 技术特点
+
+- 使用 React 18 的函数组件和 Hooks
+- 组件间通过 props 进行数据传递
+- 使用 localStorage 实现数据持久化
+- 完全无样式设计，依赖浏览器默认样式
+
+### 项目进化
+
+1. **初始版本** - 单文件 SPA，所有功能在一个组件中
+2. **组件化版本** - 组件化架构，职责分离
+3. **当前版本** - 完全无样式，纯功能实现

@@ -12,10 +12,13 @@ export const useField = (type) => {
     setValue('')
   }
 
+  // 返回两个对象：一个用于 input 属性，一个包含 reset 方法
   return {
-    type,
-    value,
-    onChange,
+    input: {
+      type,
+      value,
+      onChange
+    },
     reset
   }
 }

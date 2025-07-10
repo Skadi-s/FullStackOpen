@@ -91,24 +91,34 @@ const CreateNew = ({ addNew, setNotification }) => {
   const author = useField('text')
   const info = useField('url')
   const navigate = useNavigate()
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const newAnecdote = {
-      content: content.value,
-      author: author.value,
-      info: info.value,
+      content: content.input.value,
+      author: author.input.value,
+      info: info.input.value,
       votes: 0
     }
-    navigate('/')
+    
     addNew(newAnecdote)
-    setNotification(`A new anecdote '${content.value}' created!`)
-        setTimeout(() => {
+    setNotification(`A new anecdote '${content.input.value}' created!`)
+    
+    setTimeout(() => {
       setNotification('')
     }, 5000)
     
     // 清空表单
     content.reset()
     author.reset()  
+    info.reset()
+    
+    navigate('/')
+  }
+
+  const handleReset = () => {
+    content.reset()
+    author.reset()
     info.reset()
   }
 
@@ -118,17 +128,18 @@ const CreateNew = ({ addNew, setNotification }) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...content} />
+          <input {...content.input} />
         </div>
         <div>
           author
-          <input {...author} />
+          <input {...author.input} />
         </div>
         <div>
           url for more info
-          <input {...info} />
+          <input {...info.input} />
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
+        <button type="button" onClick={handleReset}>reset</button>
       </form>
     </div>
   )

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Route, Link, Routes, useMatch, useNavigate } from 'react-router-dom'
 import { useField } from './hooks'
+import PropTypes from 'prop-types'
 
 const Menu = () => {
   const padding = {
@@ -82,10 +83,12 @@ const Footer = () => (
   </div>
 )
 
+
+
 const CreateNew = ({ addNew, setNotification }) => {
   const content = useField('text')
   const author = useField('text')
-  const info = useField('url')
+  const info = useField('url')s
   const navigate = useNavigate()
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -126,6 +129,11 @@ const CreateNew = ({ addNew, setNotification }) => {
       </form>
     </div>
   )
+}
+
+CreateNew.propTypes = {
+  addNew: PropTypes.func.isRequired,
+  setNotification: PropTypes.func.isRequired
 }
 const App = () => {
   const [anecdotes, setAnecdotes] = useState([

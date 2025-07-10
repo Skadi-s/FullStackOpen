@@ -46,6 +46,7 @@ const Anecdote = ({ anecdote, vote }) => (
   </div>
 )
 
+
 const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
@@ -88,7 +89,7 @@ const Footer = () => (
 const CreateNew = ({ addNew, setNotification }) => {
   const content = useField('text')
   const author = useField('text')
-  const info = useField('url')s
+  const info = useField('url')
   const navigate = useNavigate()
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -101,7 +102,9 @@ const CreateNew = ({ addNew, setNotification }) => {
     navigate('/')
     addNew(newAnecdote)
     setNotification(`A new anecdote '${content.value}' created!`)
-    
+        setTimeout(() => {
+      setNotification('')
+    }, 5000)
     
     // 清空表单
     content.reset()

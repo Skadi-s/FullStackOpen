@@ -6,7 +6,6 @@ const LoginForm = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    
   };
 
   return (

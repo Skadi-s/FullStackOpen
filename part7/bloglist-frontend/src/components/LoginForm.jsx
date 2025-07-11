@@ -1,19 +1,12 @@
-import useUser from "../hooks/useUser";
 import { useState } from "react";
 
 const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useUser();
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    const credentials = { username, password };
-    const result = await login(credentials);
-    if (result.success) {
-      setUsername("");
-      setPassword("");
-    }
+    
   };
 
   return (

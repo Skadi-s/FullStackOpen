@@ -1,16 +1,7 @@
 import Blog from "./Blog";
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { initializeBlogs } from "../reducers/blogReducer";
-
+import { useSelector } from "react-redux";
 const BlogList = () => {
-    const dispatch = useDispatch();
     const blogs = useSelector(state => state.blogs);
-    
-    // 初始化博客列表
-    useEffect(() => {
-        dispatch(initializeBlogs());
-    }, [dispatch]);
     
     return (
         <div>

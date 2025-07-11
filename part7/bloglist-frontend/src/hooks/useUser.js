@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import blogService from '../services/blogService'
 import loginService from '../services/loginService'
 import { initializeBlogs } from '../reducers/blogReducer'
+import { setNotification } from '../reducers/notificationReducer'
 
 const useUser = () => {
   const [user, setUser] = useState(null)
@@ -34,6 +35,7 @@ const useUser = () => {
       return { success: true }
     } catch (error) {
       console.error('Login failed:', error)
+      dispatch(setNotification('Wrong username or password', 'error'))
       return { success: false, error: 'Wrong username or password' }
     }
   }

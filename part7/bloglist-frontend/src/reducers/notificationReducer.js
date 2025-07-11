@@ -1,6 +1,6 @@
-import createSlice from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 
-const useNotification = createSlice({
+const useNotificationSlice = createSlice({
   name: 'notification',
   initialState: null,
     reducers: {
@@ -10,5 +10,5 @@ const useNotification = createSlice({
     }
 })
 
-export const { setNotification } = useNotification.actions
-export default useNotification.reducer
+export const { setNotification } = useNotificationSlice.actions
+export default useNotificationSlice.reducer

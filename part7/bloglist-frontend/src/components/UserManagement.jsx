@@ -4,6 +4,7 @@ import userService from '../services/userService'
 import { setNotificationWithTimeout } from '../reducers/notificationReducer'
 import { initializeUsers } from '../reducers/usersReducer'
 import DatabaseReset from './DatabaseReset'
+import { getUserBlogCount } from '../utils/userStats'
 
 const UserManagement = () => {
   const dispatch = useDispatch()
@@ -30,8 +31,9 @@ const UserManagement = () => {
     }
   }
 
-  const getUserBlogCount = (userId) => {
-    return blogs.filter(blog => blog.user && blog.user.id === userId).length
+  const getUserBlogCountForUser = (userId) => {
+    const user = users.find(u => u.id === userId)
+    return getUserBlogCount(user, blogs)
   }
 
   return (
@@ -68,7 +70,7 @@ const UserManagement = () => {
           </thead>
           <tbody>
             {users.map(user => {
-              const blogCount = getUserBlogCount(user.id)
+              const blogCount = getUserBlogCountForUser(user.id)
               const isCurrentUser = currentUser && user.id === currentUser.id
               const hasIncompleteData = !user.name || user.name.trim() === ''
               

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
+import { getUserStats } from '../utils/userStats'
 
 const CurrentUserInfo = () => {
   const currentUser = useSelector(state => state.user.currentUser)
@@ -7,22 +8,7 @@ const CurrentUserInfo = () => {
   
   const userStats = useMemo(() => {
     if (!currentUser) return null
-
-    const userBlogs = blogs.filter(blog => 
-      blog.user && (blog.user.id === currentUser.id || blog.user.username === currentUser.username)
-    )
-    
-    const totalLikes = userBlogs.reduce((sum, blog) => sum + blog.likes, 0)
-    const avgLikes = userBlogs.length > 0 ? (totalLikes / userBlogs.length).toFixed(1) : 0
-    const mostLikedBlog = userBlogs.length > 0 ? 
-      userBlogs.reduce((prev, current) => prev.likes > current.likes ? prev : current) : null
-
-    return {
-      userBlogs,
-      totalLikes,
-      avgLikes,
-      mostLikedBlog
-    }
+    return getUserStats(currentUser, blogs)
   }, [currentUser, blogs])
   
   if (!currentUser || !userStats) {

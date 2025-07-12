@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { initializeUsers } from '../reducers/usersReducer'
+import { getUserBlogCount } from '../utils/userStats'
 
 const UserList = () => {
   const dispatch = useDispatch()
@@ -12,8 +13,9 @@ const UserList = () => {
   }, [dispatch])
 
   // 计算每个用户的博客数量
-  const getUserBlogCount = (userId) => {
-    return blogs.filter(blog => blog.user && blog.user.id === userId).length
+  const getUserBlogCountForUser = (userId) => {
+    const user = users.find(u => u.id === userId)
+    return getUserBlogCount(user, blogs)
   }
 
   if (isLoading) {
@@ -46,7 +48,7 @@ const UserList = () => {
                 </div>
               </td>
               <td style={{ padding: '10px' }}>
-                {getUserBlogCount(user.id)}
+                {getUserBlogCountForUser(user.id)}
               </td>
             </tr>
           ))}

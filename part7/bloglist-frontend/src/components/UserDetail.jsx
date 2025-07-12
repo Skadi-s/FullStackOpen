@@ -1,18 +1,18 @@
 import { useSelector } from 'react-redux'
+import { getUserStats } from '../utils/userStats'
 
 const UserDetail = ({ userId }) => {
   const users = useSelector(state => state.users.users)
   const blogs = useSelector(state => state.blogs)
   
   const user = users.find(u => u.id === userId)
-  const userBlogs = blogs.filter(blog => blog.user && blog.user.id === userId)
-
+  
   if (!user) {
     return <div>User not found</div>
   }
 
-  const totalLikes = userBlogs.reduce((sum, blog) => sum + blog.likes, 0)
-  const avgLikes = userBlogs.length > 0 ? (totalLikes / userBlogs.length).toFixed(1) : 0
+  const stats = getUserStats(user, blogs)
+  const { userBlogs, totalLikes, avgLikes } = stats
 
   return (
     <div>

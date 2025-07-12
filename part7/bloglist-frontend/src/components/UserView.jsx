@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import UserDetail from './UserDetail'
 import { initializeUsers } from '../reducers/usersReducer'
+import { getUserStats } from '../utils/userStats'
 
 const UserView = () => {
   const [selectedUserId, setSelectedUserId] = useState(null)
@@ -17,13 +18,12 @@ const UserView = () => {
   // 使用 useMemo 来优化统计计算
   const usersWithStats = useMemo(() => {
     return users.map(user => {
-      const userBlogs = blogs.filter(blog => blog.user && blog.user.id === user.id)
-      const totalLikes = userBlogs.reduce((sum, blog) => sum + blog.likes, 0)
+      const stats = getUserStats(user, blogs)
       return {
         ...user,
         stats: {
-          blogCount: userBlogs.length,
-          totalLikes
+          blogCount: stats.blogCount,
+          totalLikes: stats.totalLikes
         }
       }
     })

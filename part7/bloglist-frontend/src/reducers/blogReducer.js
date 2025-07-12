@@ -47,10 +47,11 @@ export const initializeBlogs = () => {
     try {
       const blogs = await blogService.getAll()
       dispatch(setBlogs(blogs))
-    } catch {
-      // dispatch(setError('Failed to fetch blogs'))
-    } finally {
-      // dispatch(setLoading(false))
+    } catch (error) {
+      // 如果是认证错误，静默处理
+      if (error.response?.status !== 401) {
+        console.error('Failed to fetch blogs:', error)
+      }
     }
   }
 }

@@ -5,6 +5,7 @@ import { setNotificationWithTimeout } from '../reducers/notificationReducer'
 import { initializeUsers } from '../reducers/usersReducer'
 import DatabaseReset from './DatabaseReset'
 import { getUserBlogCount } from '../utils/userStats'
+import { canAccessManagement, formatUserRole } from '../utils/permissions'
 
 const UserManagement = () => {
   const dispatch = useDispatch()
@@ -12,6 +13,31 @@ const UserManagement = () => {
   const currentUser = useSelector(state => state.user.currentUser)
   const blogs = useSelector(state => state.blogs)
   const [deletingUserId, setDeletingUserId] = useState(null)
+
+  // 确保只有root用户可以访问管理系统
+  if (!canAccessManagement(currentUser)) {
+    return (
+      <div style={{
+        textAlign: 'center',
+        padding: '50px',
+        backgroundColor: '#f8d7da',
+        borderRadius: '10px',
+        margin: '20px 0',
+        border: '2px solid #f5c6cb'
+      }}>
+        <h2 style={{ color: '#721c24', marginBottom: '20px' }}>🚫 Unauthorized Access</h2>
+        <p style={{ color: '#721c24', fontSize: '18px', marginBottom: '15px' }}>
+          This management system is restricted to root users only.
+        </p>
+        <p style={{ color: '#856404', fontSize: '14px', marginBottom: '10px' }}>
+          Your current role: <strong>{formatUserRole(currentUser)}</strong>
+        </p>
+        <p style={{ color: '#856404', fontSize: '14px', fontStyle: 'italic' }}>
+          Please contact your administrator if you need access to these features.
+        </p>
+      </div>
+    )
+  }
 
   const handleDeleteUser = async (userId, userName) => {
     if (!window.confirm(`Are you sure you want to delete user "${userName}"? This will also delete all their blogs.`)) {

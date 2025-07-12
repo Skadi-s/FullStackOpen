@@ -2,6 +2,11 @@ import axios from 'axios'
 const baseUrl = 'http://localhost:3000/api/blogs'
 
 const getAll = () => {
+  // 如果没有认证token，返回空数组而不发送请求
+  if (!axios.defaults.headers.common['Authorization']) {
+    return Promise.resolve([])
+  }
+  
   const request = axios.get(baseUrl)
   return request.then(response => response.data)
 }

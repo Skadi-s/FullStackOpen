@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { likeBlog, deleteBlog } from '../reducers/blogReducer';
 import { setNotificationWithTimeout } from '../reducers/notificationReducer';
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, onViewDetails }) => {
     const dispatch = useDispatch()
     const currentUser = useSelector(state => state.user.currentUser)
 
@@ -44,6 +44,19 @@ const Blog = ({ blog }) => {
                 Likes: {blog.likes} 
                 <button onClick={handleLike} style={{ marginLeft: '10px' }}>
                     Like
+                </button>
+                <button 
+                    onClick={onViewDetails} 
+                    style={{ 
+                        marginLeft: '10px',
+                        backgroundColor: '#007bff',
+                        color: 'white',
+                        border: 'none',
+                        padding: '5px 10px',
+                        cursor: 'pointer'
+                    }}
+                >
+                    View Details
                 </button>
             </p>
             {blog.user && <p>Added by: {blog.user.name}</p>}

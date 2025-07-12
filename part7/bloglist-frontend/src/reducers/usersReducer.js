@@ -29,10 +29,15 @@ export const initializeUsers = () => {
   return async dispatch => {
     try {
       dispatch(setLoading(true))
+      dispatch(setError(null))
       const users = await userService.getAll()
       dispatch(setUsers(users))
     } catch (error) {
-      dispatch(setError('Failed to fetch users'))
+      // 如果是认证错误，静默处理，不显示错误信息
+      const errorMessage = error.response?.status === 401 ? null : 'Failed to fetch users'
+      if (errorMessage) {
+        dispatch(setError(errorMessage))
+      }
     } finally {
       dispatch(setLoading(false))
     }

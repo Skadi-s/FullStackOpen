@@ -37,4 +37,20 @@ usersRouter.get('/', async (request, response) => {
   response.json(users)
 })
 
+usersRouter.delete('/:id', async (request, response) => {
+  const { id } = request.params
+
+  if (!id) {
+    return response.status(400).json({ error: 'User ID is required' })
+  }
+
+  const user = await User.findById(id)
+  if (!user) {
+    return response.status(404).json({ error: 'User not found' })
+  }
+
+  await User.findByIdAndDelete(id)
+  response.status(204).end()
+})
+
 module.exports = usersRouter

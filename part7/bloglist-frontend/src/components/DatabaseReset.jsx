@@ -5,6 +5,7 @@ import blogService from '../services/blogService'
 import { setNotificationWithTimeout } from '../reducers/notificationReducer'
 import { initializeUsers } from '../reducers/usersReducer'
 import { initializeBlogs } from '../reducers/blogReducer'
+import { canResetDatabase, formatUserRole } from '../utils/permissions'
 
 const DatabaseReset = () => {
   const dispatch = useDispatch()
@@ -12,6 +13,29 @@ const DatabaseReset = () => {
   const blogs = useSelector(state => state.blogs)
   const currentUser = useSelector(state => state.user.currentUser)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  // 确保只有root用户可以使用数据库重置功能
+  if (!canResetDatabase(currentUser)) {
+    return (
+      <div style={{ 
+        backgroundColor: '#f8d7da', 
+        border: '2px solid #f5c6cb',
+        borderRadius: '8px',
+        padding: '20px',
+        margin: '20px 0'
+      }}>
+        <h3 style={{ color: '#721c24', marginBottom: '15px' }}>
+          🚫 Access Restricted
+        </h3>
+        <p style={{ color: '#721c24', marginBottom: '10px' }}>
+          Database reset functionality is only available to root users.
+        </p>
+        <p style={{ color: '#856404', fontSize: '14px' }}>
+          Your current role: <strong>{formatUserRole(currentUser)}</strong>
+        </p>
+      </div>
+    )
+  }
 
   const handleResetDatabase = async () => {
     const confirmMessage = `

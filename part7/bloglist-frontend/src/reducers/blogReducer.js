@@ -19,16 +19,16 @@ const blogSlice = createSlice({
     // 更新博客（用于点赞等操作）
     updateBlog: (state, action) => {
       const updatedBlog = action.payload
-      const index = state.blogs.findIndex(blog => blog.id === updatedBlog.id)
+      const index = state.findIndex(blog => blog.id === updatedBlog.id)
       if (index !== -1) {
-        state.blogs[index] = updatedBlog
+        state[index] = updatedBlog
       }
     },
     
     // 删除博客
     removeBlog: (state, action) => {
       const id = action.payload
-      state.blogs = state.blogs.filter(blog => blog.id !== id)
+      return state.filter(blog => blog.id !== id)
     },
   }
 })
@@ -67,7 +67,7 @@ export const createBlog = (blogData) => {
 
 export const likeBlog = (id) => {
   return async (dispatch, getState) => {
-    const { blogs } = getState().blogs
+    const blogs = getState().blogs
     const blogToUpdate = blogs.find(blog => blog.id === id)
 
     const updatedBlogData = {

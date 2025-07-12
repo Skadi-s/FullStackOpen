@@ -1,16 +1,20 @@
+import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { likeBlog, deleteBlog } from '../reducers/blogReducer'
 import { setNotificationWithTimeout } from '../reducers/notificationReducer'
 import { canDeleteOwnBlogs } from '../utils/permissions'
+import Comments from './Comments'
 
-const BlogDetail = ({ blogId, onBack }) => {
+const BlogDetail = () => {
+  const { id } = useParams()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
   const currentUser = useSelector(state => state.user.currentUser)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
-  const blog = blogs.find(b => b.id === blogId)
+  const blog = blogs.find(b => b.id === id)
 
   if (!blog) {
     return (
@@ -26,7 +30,7 @@ const BlogDetail = ({ blogId, onBack }) => {
           The blog you're looking for doesn't exist or has been removed.
         </p>
         <button
-          onClick={onBack}
+          onClick={() => navigate('/blogs')}
           style={{
             padding: '10px 20px',
             backgroundColor: '#007bff',
@@ -55,7 +59,7 @@ const BlogDetail = ({ blogId, onBack }) => {
     try {
       await dispatch(deleteBlog(blog.id))
       dispatch(setNotificationWithTimeout(`Blog "${blog.title}" deleted successfully`, 5000))
-      onBack()
+      navigate('/blogs')
     } catch (error) {
       dispatch(setNotificationWithTimeout('Failed to delete the blog', 5000))
     }
@@ -69,7 +73,7 @@ const BlogDetail = ({ blogId, onBack }) => {
       {/* 返回按钮 */}
       <div style={{ marginBottom: '20px' }}>
         <button
-          onClick={onBack}
+          onClick={() => navigate('/blogs')}
           style={{
             padding: '8px 16px',
             backgroundColor: '#6c757d',
@@ -282,6 +286,9 @@ const BlogDetail = ({ blogId, onBack }) => {
           )}
         </div>
       </div>
+
+      {/* 评论部分 */}
+      <Comments blogId={blog.id} />
     </div>
   )
 }

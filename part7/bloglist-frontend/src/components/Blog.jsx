@@ -1,9 +1,10 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { likeBlog, deleteBlog } from '../reducers/blogReducer';
 import { setNotificationWithTimeout } from '../reducers/notificationReducer';
 
-const Blog = ({ blog, onViewDetails }) => {
+const Blog = ({ blog }) => {
     const dispatch = useDispatch()
     const currentUser = useSelector(state => state.user.currentUser)
 
@@ -45,19 +46,22 @@ const Blog = ({ blog, onViewDetails }) => {
                 <button onClick={handleLike} style={{ marginLeft: '10px' }}>
                     Like
                 </button>
-                <button 
-                    onClick={onViewDetails} 
+                <Link 
+                    to={`/blogs/${blog.id}`} 
                     style={{ 
                         marginLeft: '10px',
                         backgroundColor: '#007bff',
                         color: 'white',
                         border: 'none',
                         padding: '5px 10px',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        borderRadius: '4px',
+                        display: 'inline-block'
                     }}
                 >
                     View Details
-                </button>
+                </Link>
             </p>
             {blog.user && <p>Added by: {blog.user.name}</p>}
             {canDelete && (

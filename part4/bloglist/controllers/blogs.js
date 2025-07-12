@@ -76,4 +76,42 @@ blogRouter.put('/:id', middleware.userExtractor, async (request, response) => {
   response.json(updatedBlog)
 })
 
+// 获取博客的所有评论
+blogRouter.get('/:id/comments', async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+  
+  if (!blog) {
+    return response.status(404).json({ error: 'Blog not found' })
+  }
+  
+  response.json(blog.comments)
+})
+
+// 为博客添加评论 (匿名评论，不需要认证)
+blogRouter.post('/:id/comments', async (request, response) => {
+  const { content } = request.body
+  
+  if (!content || content.trim().length === 0) {
+    return response.status(400).json({ error: 'Comment content is required' })
+  }
+  
+  const blog = await Blog.findById(request.params.id)
+  
+  if (!blog) {
+    return response.status(404).json({ error: 'Blog not found' })
+  }
+  
+  const comment = {
+    content: content.trim(),
+    date: new Date()
+  }
+  
+  blog.comments.push(comment)
+  const updatedBlog = await blog.save()
+  
+  // 返回新添加的评论
+  const newComment = updatedBlog.comments[updatedBlog.comments.length - 1]
+  response.status(201).json(newComment)
+})
+
 module.exports = blogRouter;

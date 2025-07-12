@@ -1,55 +1,70 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { logoutUser } from '../reducers/userReducer';
 import { canAccessManagement, formatUserRole } from '../utils/permissions';
 import './Navigation.css';
 
-const Navigation = ({ activeTab, setActiveTab }) => {
+const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const currentUser = useSelector(state => state.user.currentUser);
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    setActiveTab('blogs');
+    navigate('/login');
     setIsMobileMenuOpen(false);
   };
 
-  const handleTabChange = (tabId) => {
-    setActiveTab(tabId);
+  const handleLinkClick = () => {
     setIsMobileMenuOpen(false);
   };
 
   if (!currentUser) return null;
 
   const navItems = [
-    { id: 'blogs', label: 'Blogs', icon: '📝' },
-    { id: 'users', label: 'Users', icon: '👥' }
+    { path: '/blogs', label: 'Blogs', icon: '📝' },
+    { path: '/create', label: 'Create Blog', icon: '✍️' },
+    { path: '/users', label: 'Users', icon: '👥' }
   ];
 
   if (canAccessManagement(currentUser)) {
-    navItems.push({ id: 'management', label: 'Management', icon: '🔧' });
+    navItems.push({ path: '/management', label: 'Management', icon: '🔧' });
   }
+
+  // 检查当前路径是否匹配
+  const isActive = (path) => {
+    if (path === '/blogs') {
+      return location.pathname === '/' || location.pathname === '/blogs' || location.pathname.startsWith('/blogs/');
+    }
+    return location.pathname === path;
+  };
 
   return (
     <nav className="navigation">
       <div className="nav-container">
         {/* Logo and Brand */}
         <div className="nav-brand">
-          <h2>🔗 BlogHub</h2>
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <h2>🔗 BlogHub</h2>
+          </Link>
         </div>
 
         {/* Desktop Navigation */}
         <div className="desktop-nav">
           {navItems.map(item => (
-            <button
-              key={item.id}
-              onClick={() => handleTabChange(item.id)}
-              className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={handleLinkClick}
+              className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
+              style={{ textDecoration: 'none' }}
             >
               <span>{item.icon}</span>
               <span>{item.label}</span>
-            </button>
+            </Link>
           ))}
         </div>
 
@@ -83,14 +98,16 @@ const Navigation = ({ activeTab, setActiveTab }) => {
 
             {/* Navigation Items */}
             {navItems.map(item => (
-              <button
-                key={item.id}
-                onClick={() => handleTabChange(item.id)}
-                className={`mobile-nav-item ${activeTab === item.id ? 'active' : ''}`}
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={handleLinkClick}
+                className={`mobile-nav-item ${isActive(item.path) ? 'active' : ''}`}
+                style={{ textDecoration: 'none' }}
               >
                 <span>{item.icon}</span>
                 <span>{item.label}</span>
-              </button>
+              </Link>
             ))}
 
             {/* Logout Button */}

@@ -1,5 +1,7 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
+const { graphql } = require('graphql')
+const gql = require('graphql-tag')
 
 let authors = [
   {
@@ -98,15 +100,53 @@ let books = [
 */
 
 const typeDefs = `
-  type Query {
-    dummy: Int
-  }
+    type Author {
+        name: String!
+        id: ID!
+        born: Int
+        bookCount: Int!
+    }
+
+    type Book {
+        title: String!
+        published: Int!
+        author: String!
+        id: ID!
+        genres: [String!]!
+    }
+
+    type Query {
+        booksCount: Int!
+        authorsCount: Int!
+        allBooks(author: String, genre: String): [Book!]!
+        allAuthors: [Author!]!
+        findAuthor(name: String!): Author
+        findBook(title: String!): Book
+    }
 `
 
 const resolvers = {
   Query: {
-    dummy: () => 0
-  }
+    booksCount: () => books.length,
+    authorsCount: () => authors.length,
+    allBooks: (root, args) => {
+      let filteredBooks = books
+      
+      if (args.author) {
+        filteredBooks = filteredBooks.filter(book => book.author === args.author)
+      }
+      
+      if (args.genre) {
+        filteredBooks = filteredBooks.filter(book => book.genres.includes(args.genre))
+      }
+      
+      return filteredBooks
+    },
+    allAuthors: () => authors,
+  },
+  Author: {
+    bookCount: (root) => books.filter(book => book.author === root.name).length
+  },
 }
 
 const server = new ApolloServer({

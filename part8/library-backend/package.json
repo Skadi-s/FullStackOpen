@@ -1,0 +1,28 @@
+{
+  "name": "library-backend",
+  "version": "1.0.0",
+  "description": "GraphQL backend for library application",
+  "main": "library-backend.js",
+  "scripts": {
+    "start": "node library-backend.js",
+    "dev": "nodemon library-backend.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "graphql",
+    "apollo-server",
+    "library",
+    "books",
+    "authors"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@apollo/server": "^4.10.4",
+    "graphql": "^16.8.1",
+    "graphql-tag": "^2.12.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}

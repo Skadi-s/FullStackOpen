@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom'
 import App from './App'
 
-import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
+import { ApolloClient, HttpLink, InMemoryCache, ApolloProvider } from '@apollo/client'
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),

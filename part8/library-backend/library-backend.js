@@ -2,6 +2,7 @@ const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
 const { graphql } = require('graphql')
 const gql = require('graphql-tag')
+const { v1: uuid } = require('uuid')
 
 let authors = [
   {
@@ -123,6 +124,19 @@ const typeDefs = `
         findAuthor(name: String!): Author
         findBook(title: String!): Book
     }
+
+    type Mutation {
+        addBook(
+            title: String!
+            author: String!
+            published: Int!
+            genres: [String!]!
+        ): Book
+        editAuthor(
+            name: String!
+            setBornTo: Int!
+        ): Author
+    }
 `
 
 const resolvers = {
@@ -147,6 +161,53 @@ const resolvers = {
   Author: {
     bookCount: (root) => books.filter(book => book.author === root.name).length
   },
+  Mutation: {
+    addBook: (root, args) => {
+      // 创建新书籍
+      const book = {
+        title: args.title,
+        published: args.published,
+        author: args.author,
+        id: uuid(),
+        genres: args.genres
+      }
+      
+      // 添加到书籍数组
+      books = books.concat(book)
+      
+      // 检查作者是否已存在，如果不存在则添加
+      const existingAuthor = authors.find(author => author.name === args.author)
+      if (!existingAuthor) {
+        const newAuthor = {
+          name: args.author,
+          id: uuid(),
+          born: null
+        }
+        authors = authors.concat(newAuthor)
+      }
+      
+      return book
+    },
+    editAuthor: (root, args) => {
+      // 查找要编辑的作者
+      const author = authors.find(author => author.name === args.name)
+      
+      // 如果作者不存在，返回 null
+      if (!author) {
+        return null
+      }
+      
+      // 更新作者的出生年份
+      const updatedAuthor = { ...author, born: args.setBornTo }
+      
+      // 更新 authors 数组
+      authors = authors.map(a => 
+        a.name === args.name ? updatedAuthor : a
+      )
+      
+      return updatedAuthor
+    }
+  }
 }
 
 const server = new ApolloServer({

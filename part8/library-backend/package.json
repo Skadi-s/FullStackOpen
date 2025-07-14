@@ -7,6 +7,8 @@
     "start": "node library-backend.js",
     "dev": "nodemon library-backend.js",
     "seed": "node seed.js",
+    "create-user": "node create-user.js",
+    "test-db": "node test-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -20,9 +22,12 @@
   "license": "MIT",
   "dependencies": {
     "@apollo/server": "^4.10.4",
+    "apollo-server-errors": "^3.3.1",
+    "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.0",
     "graphql": "^16.8.1",
     "graphql-tag": "^2.12.6",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.3",
     "uuid": "^11.1.0"
   },

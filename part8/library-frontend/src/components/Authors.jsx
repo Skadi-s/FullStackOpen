@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 import { gql, useQuery, useMutation } from '@apollo/client'
 
 const ALL_AUTHORS = gql`
@@ -117,6 +118,9 @@ const Authors = (props) => {
       </form>
     </div>
   )
+}
+Authors.propTypes = {
+  show: PropTypes.bool.isRequired
 }
 
 export default Authors

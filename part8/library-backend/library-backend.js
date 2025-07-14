@@ -3,7 +3,7 @@ const { expressMiddleware } = require('@apollo/server/express4')
 const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer')
 const { makeExecutableSchema } = require('@graphql-tools/schema')
 const { WebSocketServer } = require('ws')
-const { useServer } = require('graphql-ws/lib/use/ws')
+const { useServer } = require('graphql-ws/use/ws')
 const { PubSub } = require('graphql-subscriptions')
 
 const express = require('express')

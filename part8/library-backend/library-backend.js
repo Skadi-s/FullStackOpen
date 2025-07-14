@@ -35,11 +35,6 @@ mongoose.connect(process.env.MONGODB_URI)
     console.log('error connecting to MongoDB:', error.message)
   })
 
-// Data will now come from MongoDB database
-
-/*
-  you can remove the placeholder query once your first one has been implemented 
-*/
 
 const typeDefs = `
     type User {

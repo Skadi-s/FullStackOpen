@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node library-backend.js",
     "dev": "nodemon library-backend.js",
+    "seed": "node seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -19,8 +20,10 @@
   "license": "MIT",
   "dependencies": {
     "@apollo/server": "^4.10.4",
+    "dotenv": "^17.2.0",
     "graphql": "^16.8.1",
     "graphql-tag": "^2.12.6",
+    "mongoose": "^8.16.3",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

@@ -4,6 +4,7 @@ import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import LoginForm from "./components/LoginForm";
 import Recommendations from "./components/Recommendations";
+import BookAddedNotification from "./components/BookAddedNotification";
 
 const App = () => {
   const [page, setPage] = useState("authors");
@@ -40,6 +41,7 @@ const App = () => {
 
   return (
     <div>
+      <BookAddedNotification />
       <div>
         <button onClick={() => setPage("authors")}>authors</button>
         <button onClick={() => setPage("books")}>books</button>

@@ -93,7 +93,7 @@ const NewBook = (props) => {
       setGenres([])
       setGenre('')
       
-      alert('Book added successfully!')
+      // 成功消息将通过订阅显示
     } catch (error) {
       console.error('Failed to add book:', error)
       alert('Failed to add book. Please try again.')

@@ -7,6 +7,8 @@
     "start": "node library-backend.js",
     "dev": "nodemon library-backend.js",
     "seed": "node seed.js",
+    "init-db": "node init-db.js",
+    "verify-db": "node verify-db.js",
     "create-user": "node create-user.js",
     "test-db": "node test-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -29,7 +31,7 @@
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "graphql": "^16.8.1",
-    "graphql-subscriptions": "^3.0.0",
+    "graphql-subscriptions": "^2.0.0",
     "graphql-tag": "^2.12.6",
     "graphql-ws": "^6.0.5",
     "jsonwebtoken": "^9.0.2",

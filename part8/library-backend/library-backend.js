@@ -1,5 +1,15 @@
 const { ApolloServer } = require('@apollo/server')
-const { startStandaloneServer } = require('@apollo/server/standalone')
+const { expressMiddleware } = require('@apollo/server/express4')
+const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+const { WebSocketServer } = require('ws')
+const { useServer } = require('graphql-ws/lib/use/ws')
+const { PubSub } = require('graphql-subscriptions')
+
+const express = require('express')
+const cors = require('cors')
+const http = require('http')
+
 const { graphql } = require('graphql')
 const gql = require('graphql-tag')
 const { v1: uuid } = require('uuid')
@@ -12,6 +22,8 @@ require('dotenv').config()
 const Author = require('./models/author')
 const Book = require('./models/book')
 const User = require('./models/user')
+
+const pubsub = new PubSub()
 
 console.log('connecting to', process.env.MONGODB_URI)
 
@@ -85,6 +97,10 @@ const typeDefs = `
             password: String!
         ): Token
     }
+
+    type Subscription {
+        bookAdded: Book!
+    }
 `
 
 const resolvers = {
@@ -153,7 +169,12 @@ const resolvers = {
         })
         
         await book.save()
-        return book.populate('author')
+        const populatedBook = await book.populate('author')
+        
+        // 发布订阅事件
+        pubsub.publish('BOOK_ADDED', { bookAdded: populatedBook })
+        
+        return populatedBook
       } catch (error) {
         if (error.name === 'ValidationError') {
           throw new GraphQLError('Validation failed', {
@@ -279,25 +300,79 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
     }
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator('BOOK_ADDED')
+    }
   }
 }
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
+// 创建可执行的 schema
+const schema = makeExecutableSchema({ typeDefs, resolvers })
+
+// 创建 HTTP 服务器
+const app = express()
+const httpServer = http.createServer(app)
+
+// 创建 WebSocket 服务器
+const wsServer = new WebSocketServer({
+  server: httpServer,
+  path: '/graphql',
 })
 
-startStandaloneServer(server, {
-  listen: { port: process.env.PORT || 4001 },
-  context: async ({ req, res }) => {
-    const auth = req ? req.headers.authorization : null
-    if (auth && auth.toLowerCase().startsWith('bearer ')) {
-      const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET)
-      const currentUser = await User.findById(decodedToken.id)
-      return { currentUser }
-    }
-    return {}
-  },
-}).then(({ url }) => {
-  console.log(`Server ready at ${url}`)
+// 手动关闭 WebSocket 服务器
+const serverCleanup = useServer({ schema }, wsServer)
+
+// 创建 Apollo Server
+const server = new ApolloServer({
+  schema,
+  plugins: [
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+    {
+      async serverWillStart() {
+        return {
+          async drainServer() {
+            await serverCleanup.dispose()
+          },
+        }
+      },
+    },
+  ],
+})
+
+// 启动服务器
+const startServer = async () => {
+  await server.start()
+  
+  app.use(
+    '/graphql',
+    cors(),
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        const auth = req ? req.headers.authorization : null
+        if (auth && auth.toLowerCase().startsWith('bearer ')) {
+          try {
+            const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET)
+            const currentUser = await User.findById(decodedToken.id)
+            return { currentUser }
+          } catch (error) {
+            return {}
+          }
+        }
+        return {}
+      },
+    })
+  )
+
+  const PORT = process.env.PORT || 4567
+  httpServer.listen(PORT, () => {
+    console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`)
+    console.log(`🚀 Subscriptions ready at ws://localhost:${PORT}/graphql`)
+  })
+}
+
+startServer().catch((error) => {
+  console.error('Error starting server:', error)
 })

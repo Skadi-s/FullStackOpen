@@ -5,18 +5,21 @@ const ALL_BOOKS = gql`
     allBooks {
       id
       title
-      author
+      author {
+        name
+      }
       published
+      genres
     }
   }
 `
 
 const Books = (props) => {
+  const { loading, error, data } = useQuery(ALL_BOOKS)
+
   if (!props.show) {
     return null
   }
-  
-  const { loading, error, data } = useQuery(ALL_BOOKS)
 
   if (loading) return <p>Loading...</p>
   if (error) return <p>Error: {error.message}</p>
@@ -40,7 +43,7 @@ const Books = (props) => {
           {books.map((b) => (
             <tr key={b.id}>
               <td>{b.title}</td>
-              <td>{b.author}</td>
+              <td>{b.author.name}</td>
               <td>{b.published}</td>
             </tr>
           ))}

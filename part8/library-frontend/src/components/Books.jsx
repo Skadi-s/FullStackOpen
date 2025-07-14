@@ -8,6 +8,8 @@ const ALL_BOOKS = gql`
       title
       author {
         name
+        id
+        born
       }
       published
       genres
@@ -27,7 +29,8 @@ const Books = (props) => {
   const [selectedGenre, setSelectedGenre] = useState(null)
   
   const { loading, error, data } = useQuery(ALL_BOOKS, {
-    variables: { genre: selectedGenre }
+    variables: { genre: selectedGenre },
+    fetchPolicy: 'cache-and-network'
   })
 
   const { data: genresData } = useQuery(ALL_BOOKS_FOR_GENRES)
